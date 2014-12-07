@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="32001">
+		<setting id="screensaverFile" label="Select Screensaver Video" type="video"/>
+    	<setting label="32002" type="lsep"/>
+		<setting id="logEnabled" type="bool" label="32003" default="false"/>
+	</category>
+</settings>
