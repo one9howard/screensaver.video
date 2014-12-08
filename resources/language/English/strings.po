@@ -36,7 +36,46 @@ msgctxt "#32003"
 msgid "Enable debug logging"
 msgstr ""
 
+msgctxt "#32004"
+msgid "VideoScreensaver"
+msgstr ""
+
+msgctxt "#32004"
+msgid "Video Selection"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Preset Video"
+msgstr ""
+
+msgctxt "#32021"
+msgid "User Defined"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Selected Sceensaver"
+msgstr ""
+
+msgctxt "#32050"
+msgid "Set/Download Preset Video File"
+msgstr ""
+
+msgctxt "#32051"
+msgid "Select Video File"
+msgstr ""
+
 msgctxt "#32300"
 msgid "Screensaver File Is Not Valid"
 msgstr ""
 
+msgctxt "#32301"
+msgid "The following default video already exists"
+msgstr ""
+
+msgctxt "#32302"
+msgid "Reuse this file?"
+msgstr ""
+
+msgctxt "#32303"
+msgid "Downloading Screensaver Video File"
+msgstr ""

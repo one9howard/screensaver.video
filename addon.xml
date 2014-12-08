@@ -7,20 +7,18 @@
 	<extension point="xbmc.ui.screensaver" library="default.py"/>
   	<extension point="xbmc.python.script" library="screensaver.py" />
 	<extension point="xbmc.addon.metadata">
-	
+
 		<summary lang="en">Screensaver that plays a video file</summary>
 
 		<description lang="en">Plays a video when the screensaver starts, this can be a custom video or one of the built in videos</description>
-	
-		<disclaimer lang="en">None</disclaimer>
-	
+
 		<language></language>
-	
+
 		<platform>all</platform>
-	
+
 		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
 
-		<forum>http://forum.kodi.tv/showthread.php?tid=173799</forum>
+		<forum></forum>
 
 		<source>http://robwebset.googlecode.com/svn/trunk/screensaver.video/</source>
 	</extension>
