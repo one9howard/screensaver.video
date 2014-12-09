@@ -64,6 +64,10 @@ msgctxt "#32051"
 msgid "Select Video File"
 msgstr ""
 
+msgctxt "#32052"
+msgid "Show Time"
+msgstr ""
+
 msgctxt "#32300"
 msgid "Screensaver File Is Not Valid"
 msgstr ""

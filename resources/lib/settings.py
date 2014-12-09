@@ -77,3 +77,7 @@ class Settings():
     def setPresetVideoSelected(id):
         if (id is not None) and (id != -1):
             __addon__.setSetting("displaySelected", Settings.PRESET_VIDEOS[id][0])
+
+    @staticmethod
+    def isShowTime():
+        return __addon__.getSetting("showTime") == "true"

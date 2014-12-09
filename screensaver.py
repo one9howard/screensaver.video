@@ -21,6 +21,8 @@ from settings import Settings
 
 
 class ScreensaverWindow(xbmcgui.WindowXMLDialog):
+    TIME_CONTROL = 3002
+
     # Static method to create the Window class
     @staticmethod
     def createScreensaverWindow():
@@ -43,6 +45,11 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Set the video to loop, as we want it running as long as the screensaver
         xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.SetRepeat", "params": {"playerid": 0, "repeat": "all" }, "id": 1 }')
         log("Started playing")
+
+        # Now check to see if we are overlaying the time on the screen
+        # Default is hidden
+        timeControl = self.getControl(ScreensaverWindow.TIME_CONTROL)
+        timeControl.setVisible(Settings.isShowTime())
 
     # Handle any activity on the screen, this will result in a call
     # to close the screensaver window

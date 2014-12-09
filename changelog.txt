@@ -1,2 +1,5 @@
+v0.0.2
+- Add option for time to be shown in the corner
+
 v0.0.1
 - Initial Beta Version
