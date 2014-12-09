@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import urllib
 import traceback
+import base64
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -45,7 +46,8 @@ class Downloader:
             log("Downloader: Selected item %d" % select)
             selectedItem = Settings.PRESET_VIDEOS[select]
             # Download the file selected
-            videoLocation = self.download(selectedItem[2], selectedItem[1], selectedItem[0])
+            data = base64.b64decode(selectedItem[2])
+            videoLocation = self.download(data, selectedItem[1], selectedItem[0])
 
         return (select, videoLocation)
 

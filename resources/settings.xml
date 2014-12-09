@@ -6,6 +6,7 @@
 		<setting label="32050" subsetting="true" visible="eq(-2,0)" type="action" action="RunScript($CWD/download.py)"/>
 		<setting id="screensaverFile" label="32051"  visible="eq(-3,1)" type="video"/>
 		<setting id="showTime" type="bool" label="32052" default="false"/>
+		<setting id="randomStart" type="bool" label="32053" default="false"/>
     	<setting label="32002" type="lsep"/>
 		<setting id="logEnabled" type="bool" label="32003" default="false"/>
 	</category>

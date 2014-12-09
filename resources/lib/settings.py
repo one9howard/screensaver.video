@@ -55,14 +55,12 @@ def dir_exists(dirpath):
 # Stores Various Settings
 ##############################
 class Settings():
-    # ["Aquarium 3  - [6.6GB] - 1080p", "Aquarium003-1080p.mkv", ""]
-    # ["Aquarium 4  - [10GB]  - 1080p", "Aquarium003-1080p.mkv", ""]
     PRESET_VIDEOS = (
-        ["Aquarium 1  - [846MB] - 400p", "Aquarium001.mkv", "https://onedrive.live.com/download?resid=80BD16963F5C21B5!127&authkey=!ALex8PkcwV8LVJg"],
-        ["Aquarium 2  - [2.7GB] - 720p", "Aquarium002-720p.mkv", "https://onedrive.live.com/download?resid=80BD16963F5C21B5!128&authkey=!APnNfC8YAC20UmE"],
-        ["Fireplace 1 - [965MB] - 720p", "Fireplace001-720p.mkv", "https://onedrive.live.com/download?resid=80BD16963F5C21B5!129&authkey=!AGEezA6TTGU_urM"],
-        ["Fireplace 2 - [827MB] - 480p", "Fireplace002.mkv", "https://onedrive.live.com/download?resid=80BD16963F5C21B5!130&authkey=!AOf_ClWmjzqkouQ"],
-        ["Fireplace 3 - [2.1GB] - 1080p", "Fireplace03-1080p.mkv", "https://onedrive.live.com/download?resid=80BD16963F5C21B5!131&authkey=!ACZmSAeDTUxdz20"]
+        ["Aquarium 1  - [846MB] - 400p", "Aquarium001.mkv", "aHR0cHM6Ly9vbmVkcml2ZS5saXZlLmNvbS9kb3dubG9hZD9yZXNpZD04MEJEMTY5NjNGNUMyMUI1ITEyNyZhdXRoa2V5PSFBTGV4OFBrY3dWOExWSmc="],
+        ["Aquarium 2  - [2.7GB] - 720p", "Aquarium002-720p.mkv", "aHR0cHM6Ly9vbmVkcml2ZS5saXZlLmNvbS9kb3dubG9hZD9yZXNpZD04MEJEMTY5NjNGNUMyMUI1ITEyOCZhdXRoa2V5PSFBUG5OZkM4WUFDMjBVbUU="],
+        ["Fireplace 1 - [965MB] - 720p", "Fireplace001-720p.mkv", "aHR0cHM6Ly9vbmVkcml2ZS5saXZlLmNvbS9kb3dubG9hZD9yZXNpZD04MEJEMTY5NjNGNUMyMUI1ITEyOSZhdXRoa2V5PSFBR0VlekE2VFRHVV91ck0="],
+        ["Fireplace 2 - [827MB] - 480p", "Fireplace002.mkv", "aHR0cHM6Ly9vbmVkcml2ZS5saXZlLmNvbS9kb3dubG9hZD9yZXNpZD04MEJEMTY5NjNGNUMyMUI1ITEzMCZhdXRoa2V5PSFBT2ZfQ2xXbWp6cWtvdVE="],
+        ["Fireplace 3 - [2.1GB] - 1080p", "Fireplace03-1080p.mkv", "aHR0cHM6Ly9vbmVkcml2ZS5saXZlLmNvbS9kb3dubG9hZD9yZXNpZD04MEJEMTY5NjNGNUMyMUI1ITEzMSZhdXRoa2V5PSFBQ1ptU0FlRFRVeGR6MjA="]
     )
 
     @staticmethod
@@ -81,3 +79,7 @@ class Settings():
     @staticmethod
     def isShowTime():
         return __addon__.getSetting("showTime") == "true"
+
+    @staticmethod
+    def isRandomStart():
+        return __addon__.getSetting("randomStart") == 'true'

@@ -1,5 +1,7 @@
 v0.0.2
 - Add option for time to be shown in the corner
+- Make video loop if screensaver still active
+- Add option to start video at a random place
 
 v0.0.1
 - Initial Beta Version

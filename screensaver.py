@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
+import random
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -43,13 +44,24 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         xbmc.Player().play(playlist)
 
         # Set the video to loop, as we want it running as long as the screensaver
-        xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Player.SetRepeat", "params": {"playerid": 0, "repeat": "all" }, "id": 1 }')
+        xbmc.executebuiltin("PlayerControl(RepeatAll)")
         log("Started playing")
 
         # Now check to see if we are overlaying the time on the screen
         # Default is hidden
         timeControl = self.getControl(ScreensaverWindow.TIME_CONTROL)
         timeControl.setVisible(Settings.isShowTime())
+
+        # Check if we need to start at a random location
+        if Settings.isRandomStart() and xbmc.Player().isPlaying():
+            duration = int(xbmc.Player().getTotalTime())
+            log("Screensaver video has a duration of %d" % duration)
+
+            if duration > 10:
+                randomStart = random.randint(0, int(duration * 0.75))
+                log("Setting random start to %d" % randomStart)
+#                xbmc.Player().seekTime(randomStart)
+                xbmc.Player().seekTime(randomStart)
 
     # Handle any activity on the screen, this will result in a call
     # to close the screensaver window
@@ -91,8 +103,8 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
         log("Screensaver video is: %s" % videoFile)
         playlist.add(videoFile)
-        return playlist
 
+        return playlist
 
 ##################################
 # Main of the Video Screensaver
