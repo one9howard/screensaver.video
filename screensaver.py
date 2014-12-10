@@ -81,8 +81,13 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Exiting, so stop the video
         if xbmc.Player().isPlayingVideo():
             log("Stopping screensaver video")
-            xbmc.Player().stop()
+            # There is a problem with using the normal "xbmc.Player().stop()" to stop
+            # the video playing if another addon is selected - it will just continue
+            # playing the video because the call to "xbmc.Player().stop()" will hang
+            # instead we use the built in option
+            xbmc.executebuiltin("PlayerControl(Stop)")
 
+        log("Closing Window")
         xbmcgui.WindowXML.close(self)
 
     # Generates the playlist to use for the screensaver
@@ -113,3 +118,5 @@ if __name__ == '__main__':
     screenWindow = ScreensaverWindow.createScreensaverWindow()
     # Now show the window and block until we exit
     screenWindow.doModal()
+    del screenWindow
+    log("Leaving Screensaver Script")
