@@ -9,6 +9,7 @@ import xbmcvfs
 
 
 __addon__ = xbmcaddon.Addon(id='screensaver.video')
+__icon__ = __addon__.getAddonInfo('icon')
 __cwd__ = __addon__.getAddonInfo('path').decode("utf-8")
 __resource__ = xbmc.translatePath(os.path.join(__cwd__, 'resources').encode("utf-8")).decode("utf-8")
 __lib__ = xbmc.translatePath(os.path.join(__resource__, 'lib').encode("utf-8")).decode("utf-8")
@@ -102,8 +103,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Check to make sure the screensaver video file exists
         if (videoFile == "") or (not xbmcvfs.exists(videoFile)):
             log("No Screensaver file set or not valid %s" % videoFile)
-            cmd = 'XBMC.Notification("{0}", "{1}")'.format(__addon__.getLocalizedString(32300), videoFile)
-            xbmc.executebuiltin(cmd)
+            xbmc.executebuiltin('XBMC.Notification(%s, %s, 5, %s)' % (__addon__.getLocalizedString(32300), videoFile, __icon__))
             return None
 
         log("Screensaver video is: %s" % videoFile)
