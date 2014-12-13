@@ -2,6 +2,7 @@
 import sys
 import os
 import random
+import traceback
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -20,6 +21,8 @@ sys.path.append(__lib__)
 # Import the common settings
 from settings import log
 from settings import Settings
+
+from VideoParser import VideoParser
 
 
 class ScreensaverWindow(xbmcgui.WindowXMLDialog):
@@ -41,6 +44,9 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             self.close()
             return
 
+        # Update the playlist with any settings such as random start time
+        self._updatePlaylistForSettings(playlist)
+
         # Now play the video
         xbmc.Player().play(playlist)
 
@@ -53,16 +59,8 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         timeControl = self.getControl(ScreensaverWindow.TIME_CONTROL)
         timeControl.setVisible(Settings.isShowTime())
 
-        # Check if we need to start at a random location
-        if Settings.isRandomStart() and xbmc.Player().isPlaying():
-            duration = int(xbmc.Player().getTotalTime())
-            log("Screensaver video has a duration of %d" % duration)
-
-            if duration > 10:
-                randomStart = random.randint(0, int(duration * 0.75))
-                log("Setting random start to %d" % randomStart)
-#                xbmc.Player().seekTime(randomStart)
-                xbmc.Player().seekTime(randomStart)
+        # Update any settings that need to be done after the video is playing
+        self._updatePostPlayingForSettings(playlist)
 
     # Handle any activity on the screen, this will result in a call
     # to close the screensaver window
@@ -110,6 +108,53 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         playlist.add(videoFile)
 
         return playlist
+
+    # Apply any user setting to the created playlist
+    def _updatePlaylistForSettings(self, playlist):
+        # Set the random start
+        if Settings.isRandomStart() and playlist.size() > 0:
+            filename = playlist[0].getfilename()
+            duration = self._getVideoDuration(filename)
+
+            log("Duration is %d for file %s" % (duration, filename))
+
+            if duration > 10:
+                listitem = xbmcgui.ListItem()
+                # Record if the theme should start playing part-way through
+                randomStart = random.randint(0, int(duration * 0.75))
+                listitem.setProperty('StartOffset', str(randomStart))
+
+                log("Setting Random start of %d for %s" % (randomStart, filename))
+
+                # Remove the old item from the playlist
+                playlist.remove(filename)
+                # Add the new item at the start of the list
+                playlist.add(filename, listitem, 0)
+
+        return playlist
+
+    # Update anything needed once the video is playing
+    def _updatePostPlayingForSettings(self, playlist):
+        # Check if we need to start at a random location
+        if Settings.isRandomStart() and playlist.size() > 0:
+            # Need to reset the offset to the start so that if it loops
+            # it will play from the start
+            playlist[0].setProperty('StartOffset', "0")
+
+    # Returns the duration in seconds
+    def _getVideoDuration(self, filename):
+        duration = 0
+        try:
+            # Parse the video file for the duration
+            duration = VideoParser().getVideoLength(filename)
+        except:
+            log("Failed to get duration from %s" % filename)
+            log("Error: %s" % traceback.format_exc())
+            duration = 0
+
+        log("Duration retrieved is = %d" % duration)
+
+        return duration
 
 ##################################
 # Main of the Video Screensaver
