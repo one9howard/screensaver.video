@@ -40,7 +40,14 @@ class Downloader:
         select = xbmcgui.Dialog().select(__addon__.getLocalizedString(32020), displayList)
         if select == -1:
             log("Downloader: Selection cancelled by user")
-            return None
+            return (None, None)
+        elif select == len(displayList) - 1:
+            # If it is the last entry in the list, then that means all
+            # of the files, so first display an information dialog so
+            # the user knows it will only use videos already downloaded
+            log("Downloader: Selection is to use all downloaded videos")
+            xbmcgui.Dialog().ok(__addon__.getLocalizedString(32004), __addon__.getLocalizedString(32304), __addon__.getLocalizedString(32305))
+            return (-1, self.videoDir)
         else:
             log("Downloader: Selected item %d" % select)
             selectedItem = Settings.PRESET_VIDEOS[select]
@@ -110,5 +117,9 @@ class Downloader:
                 displayNamePrefix = '* '
 
             displayList.append("%s%s" % (displayNamePrefix, videoItem[0]))
+
+        # Now add the option to allow the user randomly play the downloaded
+        # videos
+        displayList.append(__addon__.getLocalizedString(32100))
 
         return displayList

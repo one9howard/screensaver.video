@@ -53,7 +53,11 @@ msgid "User Defined"
 msgstr ""
 
 msgctxt "#32022"
-msgid "Selected Sceensaver"
+msgid "Selected Screensaver"
+msgstr ""
+
+msgctxt "#32023"
+msgid "Use All Files In A Folder"
 msgstr ""
 
 msgctxt "#32050"
@@ -72,6 +76,14 @@ msgctxt "#32053"
 msgid "Start Video At Random Point"
 msgstr ""
 
+msgctxt "#32054"
+msgid "Select Videos Folder"
+msgstr ""
+
+msgctxt "#32100"
+msgid "*** All Downloaded Videos ***"
+msgstr ""
+
 msgctxt "#32300"
 msgid "Screensaver File Is Not Valid"
 msgstr ""
@@ -86,4 +98,12 @@ msgstr ""
 
 msgctxt "#32303"
 msgid "Downloading Screensaver Video File"
+msgstr ""
+
+msgctxt "#32304"
+msgid "This option will use all videos already downloaded"
+msgstr ""
+
+msgctxt "#32305"
+msgid "Each video required should be downloaded individually first"
 msgstr ""

@@ -80,16 +80,45 @@ class Settings():
 
     @staticmethod
     def setScreensaverVideo(screensaverFile):
+        __addon__.setSetting("useFolder", "false")
         __addon__.setSetting("screensaverFile", screensaverFile)
+        __addon__.setSetting("screensaverFolder", "")
+
+    @staticmethod
+    def getScreensaverFolder():
+        return __addon__.getSetting("screensaverFolder").decode("utf-8")
+
+    @staticmethod
+    def setScreensaverFolder(screensaverFolder):
+        __addon__.setSetting("useFolder", "true")
+        __addon__.setSetting("screensaverFolder", screensaverFolder)
+        __addon__.setSetting("screensaverFile", "")
+
+    @staticmethod
+    def isFolderSelection():
+        return __addon__.getSetting("useFolder") == "true"
 
     @staticmethod
     def setVideoSelectionPredefined():
         __addon__.setSetting("videoSelection", "0")
 
     @staticmethod
+    def cleanAddonSettings():
+        # We do this because this is a display field and if a user
+        # 1) Selects the "Manual Define"
+        # 2) Select a custom video
+        # 3) Returns to "Built in Videos"
+        # Then it will show the last built in video, which is not accurate
+        if __addon__.getSetting("videoSelection") == "1":
+            __addon__.setSetting("displaySelected", "")
+
+    @staticmethod
     def setPresetVideoSelected(id):
-        if (id is not None) and (id != -1):
-            __addon__.setSetting("displaySelected", Settings.PRESET_VIDEOS[id][0])
+        if id is not None:
+            if id != -1:
+                __addon__.setSetting("displaySelected", Settings.PRESET_VIDEOS[id][0])
+            else:
+                __addon__.setSetting("displaySelected", __addon__.getLocalizedString(32100))
 
     @staticmethod
     def isShowTime():
