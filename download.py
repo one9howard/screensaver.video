@@ -23,6 +23,10 @@ from downloader import Downloader
 if __name__ == '__main__':
     log("Call to download standard videos")
 
+    # Force the video selection type before we begin to ensure
+    # we show the custom type when we finish
+    Settings.setVideoSelectionPredefined()
+
     download = Downloader()
 
     (selectId, videoLocation) = download.showSelection()
@@ -37,3 +41,4 @@ if __name__ == '__main__':
     Settings.setPresetVideoSelected(selectId)
 
     log("Finished call to download standard videos")
+    del download

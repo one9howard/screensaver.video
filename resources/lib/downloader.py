@@ -15,6 +15,7 @@ from settings import Settings
 from settings import log
 from settings import os_path_join
 from settings import dir_exists
+from settings import list_dir
 
 
 class Downloader:
@@ -32,9 +33,7 @@ class Downloader:
             xbmcvfs.mkdir(self.videoDir)
 
     def showSelection(self):
-        displayList = []
-        for videoItem in Settings.PRESET_VIDEOS:
-            displayList.append(videoItem[0])
+        displayList = self._getDisplayList()
 
         videoLocation = None
         # Show the list to the user
@@ -64,6 +63,7 @@ class Downloader:
                 xbmcvfs.delete(destination)
             else:
                 # Don't want to overwrite, so nothing to do
+                log("Download: Reusing existing video file %s" % destination)
                 return destination
 
         # Create a progress dialog for the  download
@@ -93,3 +93,22 @@ class Downloader:
         # Make sure the progress dialog has been closed
         downloadProgressDialog.close()
         return destination
+
+    # Gets the list of names to display, will highlight the videos that have already
+    # been downloaded
+    def _getDisplayList(self):
+        # Check the directory where the default videos are stored to see if
+        # there are any videos already stored there
+        dirs, files = list_dir(self.videoDir)
+
+        displayList = []
+        for videoItem in Settings.PRESET_VIDEOS:
+            displayNamePrefix = ''
+            # Check if the file already exists, and has been downloaded already
+            if videoItem[1] in files:
+                log("Downloader: File %s already exists" % videoItem[1])
+                displayNamePrefix = '* '
+
+            displayList.append("%s%s" % (displayNamePrefix, videoItem[0]))
+
+        return displayList
