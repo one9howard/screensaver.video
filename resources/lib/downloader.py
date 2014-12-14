@@ -53,7 +53,7 @@ class Downloader:
             selectedItem = Settings.PRESET_VIDEOS[select]
             # Download the file selected
             data = base64.b64decode(selectedItem[2])
-            videoLocation = self.download(data, selectedItem[1], selectedItem[0])
+            videoLocation = self.download(data, selectedItem[1], __addon__.getLocalizedString(selectedItem[0]))
 
         return (select, videoLocation)
 
@@ -116,7 +116,7 @@ class Downloader:
                 log("Downloader: File %s already exists" % videoItem[1])
                 displayNamePrefix = '* '
 
-            displayList.append("%s%s" % (displayNamePrefix, videoItem[0]))
+            displayList.append("%s%s" % (displayNamePrefix, __addon__.getLocalizedString(videoItem[0])))
 
         # Now add the option to allow the user randomly play the downloaded
         # videos
