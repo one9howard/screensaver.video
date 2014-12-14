@@ -46,7 +46,7 @@ class Downloader:
             # of the files, so first display an information dialog so
             # the user knows it will only use videos already downloaded
             log("Downloader: Selection is to use all downloaded videos")
-            xbmcgui.Dialog().ok(__addon__.getLocalizedString(32004), __addon__.getLocalizedString(32304), __addon__.getLocalizedString(32305))
+            xbmcgui.Dialog().ok(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32304), __addon__.getLocalizedString(32305))
             return (-1, self.videoDir)
         else:
             log("Downloader: Selected item %d" % select)
@@ -65,7 +65,7 @@ class Downloader:
 
         # Check to see if there is already a file present
         if xbmcvfs.exists(destination):
-            overwrite = xbmcgui.Dialog().yesno(__addon__.getLocalizedString(32004), __addon__.getLocalizedString(32301), displayName, __addon__.getLocalizedString(32302))
+            overwrite = xbmcgui.Dialog().yesno(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32301), displayName, __addon__.getLocalizedString(32302))
             if overwrite is False:
                 xbmcvfs.delete(destination)
             else:

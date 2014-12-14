@@ -37,11 +37,11 @@ msgid "Enable debug logging"
 msgstr ""
 
 msgctxt "#32004"
-msgid "VideoScreensaver"
+msgid "Video Selection"
 msgstr ""
 
-msgctxt "#32004"
-msgid "Video Selection"
+msgctxt "#32005"
+msgid "VideoScreensaver"
 msgstr ""
 
 msgctxt "#32020"
