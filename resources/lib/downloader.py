@@ -110,7 +110,7 @@ class Downloader:
 
         displayList = []
         for videoItem in Settings.PRESET_VIDEOS:
-            displayNamePrefix = ''
+            displayNamePrefix = '   '
             # Check if the file already exists, and has been downloaded already
             if videoItem[1] in files:
                 log("Downloader: File %s already exists" % videoItem[1])

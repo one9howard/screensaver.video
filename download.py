@@ -43,9 +43,9 @@ if __name__ == '__main__':
         # Now set the path in the video dialog
         Settings.setScreensaverVideo(videoLocation)
 
-    log("Setting new video preselect to: %d" % selectId)
-
-    Settings.setPresetVideoSelected(selectId)
+    if selectId is not None:
+        log("Setting new video preselect to: %d" % selectId)
+        Settings.setPresetVideoSelected(selectId)
 
     log("Finished call to download standard videos")
     del download
