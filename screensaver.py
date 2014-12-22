@@ -35,6 +35,7 @@ from VideoParser import VideoParser
 
 class ScreensaverWindow(xbmcgui.WindowXMLDialog):
     TIME_CONTROL = 3002
+    DIM_CONTROL = 3003
 
     # Static method to create the Window class
     @staticmethod
@@ -70,6 +71,13 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Default is hidden
         timeControl = self.getControl(ScreensaverWindow.TIME_CONTROL)
         timeControl.setVisible(Settings.isShowTime())
+
+        # Set the value of the dimming for the video
+        dimLevel = Settings.getDimValue()
+        if Settings.getDimValue() is not None:
+            log("Setting Dim Level to: %s" % dimLevel)
+            dimControl = self.getControl(ScreensaverWindow.DIM_CONTROL)
+            dimControl.setColorDiffuse(dimLevel)
 
         # Update any settings that need to be done after the video is playing
         self._updatePostPlayingForSettings(playlist)
