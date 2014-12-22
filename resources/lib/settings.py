@@ -131,3 +131,9 @@ class Settings():
     @staticmethod
     def isBlockScreensaverIfMediaPlaying():
         return __addon__.getSetting("mediaPlayingBlock") == 'true'
+
+    @staticmethod
+    def getVolume():
+        if __addon__.getSetting("alterVolume") == 'false':
+            return -1
+        return int(float(__addon__.getSetting("screensaverVolume")))
