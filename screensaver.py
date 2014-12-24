@@ -45,6 +45,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
     # Called when setting up the window
     def onInit(self):
         xbmcgui.WindowXML.onInit(self)
+        self.volumeCtrl = None
 
         # Get the videos to use as a screensaver
         playlist = self._getPlaylist()
@@ -109,8 +110,9 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Reset the Player Repeat
         xbmc.executebuiltin("PlayerControl(RepeatOff)")
 
-        # Restore the volume
-        self.volumeCtrl.restoreVolume()
+        if self.volumeCtrl is not None:
+            # Restore the volume
+            self.volumeCtrl.restoreVolume()
 
         log("Closing Window")
         xbmcgui.WindowXML.close(self)
