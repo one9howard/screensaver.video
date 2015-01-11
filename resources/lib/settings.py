@@ -166,3 +166,10 @@ class Settings():
             return Settings.DIM_LEVEL[int(__addon__.getSetting("dimLevel"))]
         else:
             return '00000000'
+
+    @staticmethod
+    def screensaverTimeout():
+        timoutSetting = 0
+        if __addon__.getSetting("stopAutomatic") == 'true':
+            timoutSetting = int(float(__addon__.getSetting("stopAfter")))
+        return timoutSetting
