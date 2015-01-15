@@ -68,7 +68,10 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         xbmc.Player().play(playlist)
 
         # Set the video to loop, as we want it running as long as the screensaver
-        xbmc.executebuiltin("PlayerControl(RepeatAll)")
+        repeatType = Settings.getFolderRepeatType()
+        if repeatType is not None:
+            log("Setting Repeat Type to %s" % repeatType)
+            xbmc.executebuiltin("PlayerControl(%s)" % repeatType)
         log("Started playing")
 
         # Now check to see if we are overlaying the time on the screen
