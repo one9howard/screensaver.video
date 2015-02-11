@@ -37,6 +37,16 @@ if __name__ == '__main__':
     alreadyRunning = xbmcgui.Window(10000).getProperty("VideoScreensaverRunning")
     if alreadyRunning in ["", None]:
         xbmcgui.Window(10000).setProperty("VideoScreensaverRunning", "true")
+
+        # Make a special check to see if TvTunes is running - as we want to give that time
+        # to stop before we start trying to play the video
+        maxTvTunesWait = 30
+        while maxTvTunesWait > 0:
+            maxTvTunesWait = maxTvTunesWait - 1
+            # If TvTunes is not running then stop waiting
+            if xbmcgui.Window(10025).getProperty("TvTunesIsRunning") in [None, ""]:
+                break
+
         # Give a little bit of time for everything to shake out before starting the screensaver
         # waiting another few seconds to start a screensaver is not going to make a difference
         # to the user
