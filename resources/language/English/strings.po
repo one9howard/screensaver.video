@@ -183,7 +183,7 @@ msgid "Woodland 1 - [1.3GB] - 720p"
 msgstr ""
 
 msgctxt "#32114"
-msgid "Star Track TNG 1 - [54MB] - 720p"
+msgid "Star Trek TNG 1 - [54MB] - 720p"
 msgstr ""
 
 msgctxt "#32115"
