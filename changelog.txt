@@ -1,3 +1,6 @@
+v1.0.8
+- Add additional beach, matrix, space and woodland screensavers
+
 v1.0.7
 - Move screensaver videos to different host
 - Add beach and space screensaver
