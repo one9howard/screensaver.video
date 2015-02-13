@@ -93,7 +93,7 @@ if __name__ == '__main__':
                 xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "Input.ContextMenu", "id": 1}')
 
         except:
-            log("Faild to start VideoScreensaver: %s" % traceback.format_exc())
+            log("Failed to start VideoScreensaver: %s" % traceback.format_exc())
 
         xbmcgui.Window(10025).clearProperty("TvTunesIsRunning")
         xbmcgui.Window(10000).clearProperty("VideoScreensaverRunning")
