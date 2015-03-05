@@ -67,6 +67,7 @@ class Downloader:
         if xbmcvfs.exists(destination):
             overwrite = xbmcgui.Dialog().yesno(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32301), displayName, __addon__.getLocalizedString(32302))
             if overwrite is False:
+                log("Download: Removing existing file %s ready for fresh download" % destination)
                 xbmcvfs.delete(destination)
             else:
                 # Don't want to overwrite, so nothing to do
