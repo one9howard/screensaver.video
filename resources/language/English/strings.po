@@ -206,7 +206,23 @@ msgctxt "#32119"
 msgid "Beach 3 - [3.4GB] - 720p"
 msgstr ""
 
-#empty strings from id 32120 to 32299
+msgctxt "#32120"
+msgid "Snow 1 - [1.3GB] - 720p"
+msgstr ""
+
+msgctxt "#32121"
+msgid "Snow 2 - [677MB] - 1080p"
+msgstr ""
+
+msgctxt "#32122"
+msgid "Snow 3 - [1.2GB] - 720p"
+msgstr ""
+
+msgctxt "#32123"
+msgid "Watermill 1 - [549MB] - 1080p"
+msgstr ""
+
+#empty strings from id 32124 to 32299
 
 msgctxt "#32300"
 msgid "Screensaver File Is Not Valid"
