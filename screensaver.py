@@ -213,8 +213,8 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             # Parse the video file for the duration
             duration = VideoParser().getVideoLength(filename)
         except:
-            log("Failed to get duration from %s" % filename)
-            log("Error: %s" % traceback.format_exc())
+            log("Failed to get duration from %s" % filename, xbmc.LOGERROR)
+            log("Error: %s" % traceback.format_exc(), xbmc.LOGERROR)
             duration = 0
 
         log("Duration retrieved is = %d" % duration)
@@ -259,7 +259,7 @@ class VolumeDrop(object):
             else:
                 log("Player: No reduced volume option set")
         except:
-            log("VolumeDrop: %s" % traceback.format_exc())
+            log("VolumeDrop: %s" % traceback.format_exc(), xbmc.LOGERROR)
 
     def restoreVolume(self):
         try:
@@ -267,7 +267,7 @@ class VolumeDrop(object):
             if self.screensaverVolume > -1:
                 self._setVolume(self.original_volume)
         except:
-            log("VolumeDrop: %s" % traceback.format_exc())
+            log("VolumeDrop: %s" % traceback.format_exc(), xbmc.LOGERROR)
 
 
 ##################################
