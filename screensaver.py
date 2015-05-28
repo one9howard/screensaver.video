@@ -257,7 +257,11 @@ class VolumeDrop(object):
 
     def lowerVolume(self):
         try:
-            if self.screensaverVolume > -1:
+            # If we are after a zero volume then we have the option to suspend
+            # the Audio Engine
+            if Settings.isUseAudioSuspend():
+                xbmc.audioSuspend()
+            elif self.screensaverVolume > -1:
                 vol = self.screensaverVolume
                 # Make sure the volume still has a value, otherwise we see the mute symbol
                 if vol < 1:
@@ -271,8 +275,10 @@ class VolumeDrop(object):
 
     def restoreVolume(self):
         try:
+            if Settings.isUseAudioSuspend():
+                xbmc.audioResume()
             # Don't change the volume unless requested to
-            if self.screensaverVolume > -1:
+            elif self.screensaverVolume > -1:
                 self._setVolume(self.original_volume)
         except:
             log("VolumeDrop: %s" % traceback.format_exc(), xbmc.LOGERROR)
