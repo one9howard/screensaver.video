@@ -86,7 +86,7 @@ if __name__ == '__main__':
                 # playing for the screensaver, it will then listen for any action or
                 # activity and stop the video being used as the screensaver
                 log("Running video screensaver in separate thread")
-                xbmc.executebuiltin('XBMC.RunScript(%s)' % (os.path.join(__cwd__, "screensaver.py")))
+                xbmc.executebuiltin('RunScript(%s)' % (os.path.join(__cwd__, "screensaver.py")))
                 # Give the screensaver time to kick in
                 xbmc.sleep(3000)
             else:
