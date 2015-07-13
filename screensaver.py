@@ -176,7 +176,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
                 errorLocation = Settings.getScreensaverFolder()
 
             log("No Screensaver file set or not valid %s" % errorLocation)
-            cmd = 'Notification("{0}", "{1}", 5, "{2}")'.format(__addon__.getLocalizedString(32300).encode('utf-8'), errorLocation, __icon__)
+            cmd = 'Notification("{0}", "{1}", 3000, "{2}")'.format(__addon__.getLocalizedString(32300).encode('utf-8'), errorLocation, __icon__)
             xbmc.executebuiltin(cmd)
             return None
 
