@@ -1,5 +1,6 @@
 v1.1.8
 - Switch default downloads to server kindly provided by Ziggy
+- Add additional screensavers
 
 v1.1.7
 - Prevent possible deadlock while background media is playing
