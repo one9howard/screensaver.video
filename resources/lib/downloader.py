@@ -87,7 +87,8 @@ class Downloader:
         # First Try Ziggy Server, then the default
         urls = []
         urls.append(base64.b64decode(self.ziggyServer) + filename)
-        urls.append(fileUrl)
+        if fileUrl not in [None, ""]:
+            urls.append(fileUrl)
 
         showError = False
         downloadOK = False

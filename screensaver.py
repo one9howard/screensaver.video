@@ -3,6 +3,7 @@ import sys
 import os
 import random
 import traceback
+import time
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -29,6 +30,7 @@ from settings import Settings
 from settings import list_dir
 from settings import os_path_join
 from settings import dir_exists
+from settings import os_path_split
 
 from VideoParser import VideoParser
 
@@ -184,20 +186,48 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
     # Apply any user setting to the created playlist
     def _updatePlaylistForSettings(self, playlist):
+        if playlist.size() < 1:
+            return playlist
+
+        filename = playlist[0].getfilename()
+        duration = self._getVideoDuration(filename)
+        log("Duration is %d for file %s" % (duration, filename))
+
+        startTime = 0
+
+        # Check if we have a random start time
+        if Settings.isRandomStart():
+            startTime = random.randint(0, int(duration * 0.75))
+
+        justFilename = os_path_split(filename)[-1]
+        # Check if we are dealing with a clock
+        if 'clock' in justFilename.lower():
+            # Get the current time, we need to convert
+            localTime = time.localtime()
+            startTime = (((localTime.tm_hour * 60) + localTime.tm_min) * 60) + localTime.tm_sec
+
+            # Check if the video is the 12 hour or 24 hour clock
+            if duration < 46800:
+                # 12 hour clock
+                log("12 hour clock detected for %s" % justFilename)
+                if startTime > 43200:
+                    startTime = startTime - 43200
+            else:
+                log("24 hour clock detected for %s" % justFilename)
+
+        # Just make sure that the start time is not larger than the duration
+        if startTime > duration:
+            log("Start time %d later than duration %d" % (startTime, duration))
+            startTime = 0
+
         # Set the random start
-        if Settings.isRandomStart() and playlist.size() > 0:
-            filename = playlist[0].getfilename()
-            duration = self._getVideoDuration(filename)
-
-            log("Duration is %d for file %s" % (duration, filename))
-
+        if startTime > 0:
             if duration > 10:
                 listitem = xbmcgui.ListItem()
                 # Record if the theme should start playing part-way through
-                randomStart = random.randint(0, int(duration * 0.75))
-                listitem.setProperty('StartOffset', str(randomStart))
+                listitem.setProperty('StartOffset', str(startTime))
 
-                log("Setting Random start of %d for %s" % (randomStart, filename))
+                log("Setting start of %d for %s" % (startTime, filename))
 
                 # Remove the old item from the playlist
                 playlist.remove(filename)

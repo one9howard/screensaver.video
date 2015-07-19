@@ -38,6 +38,31 @@ def os_path_join(dir, file):
     return os.path.join(dir, file)
 
 
+# Splits a path the same way as os.path.split but supports paths of a different
+# OS than that being run on
+def os_path_split(fullpath):
+    # Check if it ends in a slash
+    if fullpath.endswith("/") or fullpath.endswith("\\"):
+        # Remove the slash character
+        fullpath = fullpath[:-1]
+
+    try:
+        slash1 = fullpath.rindex("/")
+    except:
+        slash1 = -1
+
+    try:
+        slash2 = fullpath.rindex("\\")
+    except:
+        slash2 = -1
+
+    # Parse based on the last type of slash in the string
+    if slash1 > slash2:
+        return fullpath.rsplit("/", 1)
+
+    return fullpath.rsplit("\\", 1)
+
+
 # Checks if a directory exists (Do not use for files)
 def dir_exists(dirpath):
     directoryPath = dirpath
@@ -72,6 +97,8 @@ class Settings():
     #    Aquarium004-720p.mp4
     #    Beach002-720p.mp4
     #    Christmas001-1080p.mp4
+    #    Clock001-720p.mp4
+    #    Clock002-360p.mp4
     #    Fireplace001-720p.mkv
     #    Fireplace002.mkv
     #    JohnnyCastaway001-480.mp4
@@ -109,6 +136,8 @@ class Settings():
         [32110, "Beach002-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD1CN0U5RjZDRTNBNUE0QTVRUVdFMjEwMzI1MUVXUVM="],
         [32119, "Beach003-720p.mp4", "aHR0cDovL2NvcHkuY29tL0t0OVFsNlVlVEVLR09vZXU/ZG93bmxvYWQ9MQ=="],
         [32125, "Christmas001-1080p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvQjE0NEQ1MDIzQTVBNEE1UVFXRTEzMDY3MDJFV1FTL0NocmlzdG1hczAwMS0xMDgwcC5tcDQ="],
+        [32130, "Clock001-720p.mp4", ""],
+        [32131, "Clock002-360p.mp4", ""],
         [32103, "Fireplace001-720p.mkv", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD1ENzMwODE2OTNBNUE0QTVRUVdFMjAxMTcyOUVXUVM="],
         [32104, "Fireplace002.mkv", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD05QkRBRDdDODNBNUE0QTVRUVdFMjAxMTY4OUVXUVM="],
         [32105, "Fireplace003-1080p.mkv", "aHR0cDovL2NvcHkuY29tL1dzZEcwdmZ0cWl2V3NqWUQ/ZG93bmxvYWQ9MQ=="],
