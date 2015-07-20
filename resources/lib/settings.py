@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import time
 import xbmc
 import xbmcaddon
 import xbmcvfs
@@ -304,3 +305,29 @@ class Settings():
         if Settings.getVolume() == 0:
             return __addon__.getSetting("useAudioSuspend") == 'true'
         return False
+
+    @staticmethod
+    def getTimeForClock(filenameAndPath, duration):
+        startTime = 0
+        justFilename = os_path_split(filenameAndPath)[-1]
+        # Check if we are dealing with a clock
+        if 'clock' in justFilename.lower():
+            # Get the current time, we need to convert
+            localTime = time.localtime()
+            startTime = (((localTime.tm_hour * 60) + localTime.tm_min) * 60) + localTime.tm_sec
+
+            # Check if the video is the 12 hour or 24 hour clock
+            if duration < 46800:
+                # 12 hour clock
+                log("12 hour clock detected for %s" % justFilename)
+                if startTime > 43200:
+                    startTime = startTime - 43200
+            else:
+                log("24 hour clock detected for %s" % justFilename)
+
+        # Just make sure that the start time is not larger than the duration
+        if startTime > duration:
+            log("Start time %d later than duration %d" % (startTime, duration))
+            startTime = 0
+
+        return startTime

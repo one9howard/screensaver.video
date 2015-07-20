@@ -3,7 +3,6 @@ import sys
 import os
 import random
 import traceback
-import time
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -30,9 +29,56 @@ from settings import Settings
 from settings import list_dir
 from settings import os_path_join
 from settings import dir_exists
-from settings import os_path_split
 
 from VideoParser import VideoParser
+
+
+# Video Screensaver Player that can detect when the next item in a playlist starts
+class VideoScreensaverPlayer(xbmc.Player):
+    def __init__(self, *args):
+        self.initialStart = True
+        xbmc.Player.__init__(self, *args)
+
+    def onPlayBackStarted(self):
+        # The first item in a playlist will have already had it's start time
+        # set correctly if it is a clock
+        if self.initialStart is True:
+            self.initialStart = False
+            log("onPlayBackStarted received for initial video")
+            return
+
+        if self.isPlayingVideo():
+            # Get the currently playing file
+            filename = self.getPlayingFile()
+            log("onPlayBackStarted received for file %s" % filename)
+
+            duration = self._getVideoDuration(filename)
+            log("onPlayBackStarted: Duration is %d for file %s" % (duration, filename))
+
+            startTime = Settings.getTimeForClock(filename, duration)
+
+            # Set the clock start time
+            if startTime > 0 and duration > 10:
+                self.seekTime(startTime)
+        else:
+            log("onPlayBackStarted received, but not playing video file")
+
+        xbmc.Player.onPlayBackStarted(self)
+
+    # Returns the duration in seconds
+    def _getVideoDuration(self, filename):
+        duration = 0
+        try:
+            # Parse the video file for the duration
+            duration = VideoParser().getVideoLength(filename)
+        except:
+            log("Failed to get duration from %s" % filename, xbmc.LOGERROR)
+            log("Error: %s" % traceback.format_exc(), xbmc.LOGERROR)
+            duration = 0
+
+        log("Duration retrieved is = %d" % duration)
+
+        return duration
 
 
 class ScreensaverWindow(xbmcgui.WindowXMLDialog):
@@ -42,6 +88,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
     def __init__(self, *args, **kwargs):
         self.isClosed = False
+        self.player = VideoScreensaverPlayer()
 
     # Static method to create the Window class
     @staticmethod
@@ -68,7 +115,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         self.volumeCtrl.lowerVolume()
 
         # Now play the video
-        xbmc.Player().play(playlist)
+        self.player.play(playlist)
 
         # Set the video to loop, as we want it running as long as the screensaver
         repeatType = Settings.getFolderRepeatType()
@@ -118,7 +165,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
     def close(self):
         log("Ending Screensaver")
         # Exiting, so stop the video
-        if xbmc.Player().isPlayingVideo():
+        if self.player.isPlayingVideo():
             log("Stopping screensaver video")
             # There is a problem with using the normal "xbmc.Player().stop()" to stop
             # the video playing if another addon is selected - it will just continue
@@ -198,41 +245,24 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Check if we have a random start time
         if Settings.isRandomStart():
             startTime = random.randint(0, int(duration * 0.75))
+            startTime = duration - 5
 
-        justFilename = os_path_split(filename)[-1]
-        # Check if we are dealing with a clock
-        if 'clock' in justFilename.lower():
-            # Get the current time, we need to convert
-            localTime = time.localtime()
-            startTime = (((localTime.tm_hour * 60) + localTime.tm_min) * 60) + localTime.tm_sec
-
-            # Check if the video is the 12 hour or 24 hour clock
-            if duration < 46800:
-                # 12 hour clock
-                log("12 hour clock detected for %s" % justFilename)
-                if startTime > 43200:
-                    startTime = startTime - 43200
-            else:
-                log("24 hour clock detected for %s" % justFilename)
-
-        # Just make sure that the start time is not larger than the duration
-        if startTime > duration:
-            log("Start time %d later than duration %d" % (startTime, duration))
-            startTime = 0
+        clockStart = Settings.getTimeForClock(filename, duration)
+        if clockStart > 0:
+            startTime = clockStart
 
         # Set the random start
-        if startTime > 0:
-            if duration > 10:
-                listitem = xbmcgui.ListItem()
-                # Record if the theme should start playing part-way through
-                listitem.setProperty('StartOffset', str(startTime))
+        if (startTime > 0) and (duration > 10):
+            listitem = xbmcgui.ListItem()
+            # Record if the theme should start playing part-way through
+            listitem.setProperty('StartOffset', str(startTime))
 
-                log("Setting start of %d for %s" % (startTime, filename))
+            log("Setting start of %d for %s" % (startTime, filename))
 
-                # Remove the old item from the playlist
-                playlist.remove(filename)
-                # Add the new item at the start of the list
-                playlist.add(filename, listitem, 0)
+            # Remove the old item from the playlist
+            playlist.remove(filename)
+            # Add the new item at the start of the list
+            playlist.add(filename, listitem, 0)
 
         return playlist
 
