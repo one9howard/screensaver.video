@@ -123,10 +123,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         self.player.play(playlist)
 
         # Set the video to loop, as we want it running as long as the screensaver
-        repeatType = Settings.getFolderRepeatType()
-        if repeatType is not None:
-            log("Setting Repeat Type to %s" % repeatType)
-            xbmc.executebuiltin("PlayerControl(%s)" % repeatType)
+        self._setRepeat()
         log("Started playing")
 
         # Now check to see if we are overlaying the time on the screen
@@ -325,6 +322,13 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         else:
             overlayControl.setVisible(False)
 
+    def _setRepeat(self):
+        # Set the video to loop, as we want it running as long as the screensaver
+        repeatType = Settings.getFolderRepeatType()
+        if repeatType is not None:
+            log("Setting Repeat Type to %s" % repeatType)
+            xbmc.executebuiltin("PlayerControl(%s)" % repeatType)
+
     def check(self):
         oldScheduleValue = self.currentScheduleItem
 
@@ -339,11 +343,20 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
         # If we reach here, there is a change of some sort
         if newPlaylist is not None:
+            # Update the playlist with any settings such as random start time
+            self._updatePlaylistForSettings(newPlaylist)
+
             # Start playing the new file, just override the existing one that is playing
             self.player.play(newPlaylist)
 
             # Also update the overlay
             self._setOverlayImage()
+
+            # Now set the repeat option
+            self._setRepeat()
+
+            # Update any settings that need to be done after the video is playing
+            self._updatePostPlayingForSettings(newPlaylist)
 
 
 class VolumeDrop(object):
