@@ -2,6 +2,7 @@
 import sys
 import os
 import random
+import time
 import traceback
 import xbmc
 import xbmcaddon
@@ -29,6 +30,7 @@ from settings import Settings
 from settings import list_dir
 from settings import os_path_join
 from settings import dir_exists
+from settings import os_path_isfile
 
 from VideoParser import VideoParser
 
@@ -89,6 +91,9 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
     def __init__(self, *args, **kwargs):
         self.isClosed = False
         self.player = VideoScreensaverPlayer()
+        # Create the scheduler that will store when each item should be played
+        self.scheduler = Scheduler()
+        self.currentScheduleItem = -1
 
     # Static method to create the Window class
     @staticmethod
@@ -137,11 +142,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             dimControl.setColorDiffuse(dimLevel)
 
         # Set the overlay image
-        overlayImage = Settings.getOverlayImage()
-        if overlayImage is not None:
-            log("Setting Overlay Image to: %s" % overlayImage)
-            overlayControl = self.getControl(ScreensaverWindow.OVERLAY_CONTROL)
-            overlayControl.setImage(overlayImage)
+        self._setOverlayImage()
 
         # Update any settings that need to be done after the video is playing
         self._updatePostPlayingForSettings(playlist)
@@ -191,14 +192,31 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         playlist.clear()
 
+        # Check to see if we should be using a video from the schedule
+        scheduleEntry = self.scheduler.getScheduleEntry()
+
+        if scheduleEntry != -1:
+            # There is an item scheduled, so check to see if the item has actually changed
+            if scheduleEntry == self.currentScheduleItem:
+                return None
+            # Set the entry we are about to play
+            self.currentScheduleItem = scheduleEntry
+            # Get the actual video file that should be played
+            scheduledVideo = self.scheduler.getScheduleVideo(scheduleEntry)
+            # Do a quick check to see if the video exists
+            if xbmcvfs.exists(scheduledVideo):
+                log("Screensaver video for scheduled item %d is: %s" % (scheduleEntry, scheduledVideo))
+                playlist.add(scheduledVideo)
+
         # Check if we are showing all the videos in a given folder
-        if Settings.isFolderSelection():
+        elif Settings.isFolderSelection():
             videosFolder = Settings.getScreensaverFolder()
             if (videosFolder is None):
                 videosFolder == ""
 
             # Check if we are dealing with a Folder of videos
             if videosFolder != "" and dir_exists(videosFolder):
+                self.currentScheduleItem = -1
                 dirs, files = list_dir(videosFolder)
                 # Now shuffle the playlist to ensure that if there are more
                 #  than one video a different one starts each time
@@ -215,6 +233,7 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
             # Check to make sure the screensaver video file exists
             if (videoFile != "") and xbmcvfs.exists(videoFile):
+                self.currentScheduleItem = -1
                 log("Screensaver video is: %s" % videoFile)
                 playlist.add(videoFile)
 
@@ -289,6 +308,43 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
 
         return duration
 
+    # Set the overlay image to the correct value
+    def _setOverlayImage(self):
+        overlayImage = Settings.getOverlayImage()
+
+        # Check if we should set the overlay image based on a schedule
+        if self.currentScheduleItem != -1:
+            overlayImage = self.scheduler.getScheduleOverlay(self.currentScheduleItem)
+
+        overlayControl = self.getControl(ScreensaverWindow.OVERLAY_CONTROL)
+
+        if overlayImage is not None:
+            log("Setting Overlay Image to: %s" % overlayImage)
+            overlayControl.setImage(overlayImage)
+            overlayControl.setVisible(True)
+        else:
+            overlayControl.setVisible(False)
+
+    def check(self):
+        oldScheduleValue = self.currentScheduleItem
+
+        # Check to see if there needs to be a change in what is playing
+        # This will also update the schedule item so we know what has been selected
+        newPlaylist = self._getPlaylist()
+
+        # Check to see if the scheduled item has changed, if it has not then
+        # there is nothing to do
+        if oldScheduleValue == self.currentScheduleItem:
+            return
+
+        # If we reach here, there is a change of some sort
+        if newPlaylist is not None:
+            # Start playing the new file, just override the existing one that is playing
+            self.player.play(newPlaylist)
+
+            # Also update the overlay
+            self._setOverlayImage()
+
 
 class VolumeDrop(object):
     def __init__(self, *args):
@@ -344,6 +400,70 @@ class VolumeDrop(object):
             log("VolumeDrop: %s" % traceback.format_exc(), xbmc.LOGERROR)
 
 
+# Class to store all the schedule details and work out which video should
+# be playing at a given time
+class Scheduler(object):
+    def __init__(self, *args):
+        self.scheduleDetails = []
+
+        # Collect together all of the scheduled videos
+        numScheduleEntries = Settings.getNumberOfScheduleRules()
+        log("Schedule: Number of schedule entries is %d" % numScheduleEntries)
+        itemNum = 1
+        while itemNum <= numScheduleEntries:
+            videoFile = Settings.getRuleVideoFile(itemNum)
+            if videoFile not in [None, ""]:
+                # Support special paths like smb:// means that we can not just call
+                # os.path.isfile as it will return false even if it is a file
+                # (A bit of a shame - but that's the way it is)
+                if videoFile.startswith("smb://") or os_path_isfile(videoFile):
+                    overlayFile = Settings.getRuleOverlayFile(itemNum)
+                    startTime = Settings.getRuleStartTime(itemNum)
+                    endTime = Settings.getRuleEndTime(itemNum)
+                    log("Schedule: Item %d (Start:%d, End:%d) contains video %s" % (itemNum, startTime, endTime, videoFile))
+                    details = {'id': itemNum, 'start': startTime, 'end': endTime, 'video': videoFile, 'overlay': overlayFile}
+                    self.scheduleDetails.append(details)
+                else:
+                    log("Schedule: File does not exist: %s" % videoFile)
+            else:
+                log("Schedule: Video file not set for entry %d" % itemNum)
+            itemNum = itemNum + 1
+
+    # Get the ID of which schedule should be used
+    def getScheduleEntry(self):
+        # Get the current time that we are checking the schedule for
+        localTime = time.localtime()
+        currentTime = (localTime.tm_hour * 60) + localTime.tm_min
+
+        # Check the scheduled items to see if any cover the current time
+        for item in self.scheduleDetails:
+            if (item['start'] <= currentTime) and (item['end'] >= currentTime):
+                return item['id']
+
+        return -1
+
+    # Get the video for a given Id
+    def getScheduleVideo(self, id):
+        videoFile = None
+        # Find the entry matching this Id
+        for item in self.scheduleDetails:
+            if item['id'] == id:
+                videoFile = item['video']
+                break
+        return videoFile
+
+    # Get the overlay image for a given Id
+    def getScheduleOverlay(self, id):
+        imageFile = None
+        # Find the entry matching this Id
+        for item in self.scheduleDetails:
+            if item['id'] == id:
+                if item['overlay'] not in [None, ""]:
+                    imageFile = item['overlay']
+                break
+        return imageFile
+
+
 ##################################
 # Main of the Video Screensaver
 ##################################
@@ -367,7 +487,9 @@ if __name__ == '__main__':
         try:
             # Now show the window and block until we exit
             screensaverTimeout = Settings.screensaverTimeout()
-            if screensaverTimeout < 1:
+            numScheduleEntries = Settings.getNumberOfScheduleRules()
+
+            if (screensaverTimeout < 1) and (numScheduleEntries < 1):
                 log("Starting Screensaver in Modal Mode")
                 screenWindow.doModal()
             else:
@@ -382,14 +504,18 @@ if __name__ == '__main__':
                 # Now wait until the screensaver is closed
                 while not screenWindow.isComplete():
                     xbmc.sleep(checkInterval)
-                    # Update the countdown
-                    countdown = countdown - 1
-                    if countdown < 1:
-                        log("Stopping Screensaver as countdown expired")
-                        # Close the screensaver window
-                        screenWindow.close()
-                        # Reset the countdown to stop multiple closes being sent
-                        countdown = 100
+                    if screensaverTimeout > 0:
+                        # Update the countdown
+                        countdown = countdown - 1
+                        if countdown < 1:
+                            log("Stopping Screensaver as countdown expired")
+                            # Close the screensaver window
+                            screenWindow.close()
+                            # Reset the countdown to stop multiple closes being sent
+                            countdown = 100
+                    # Check to see if there is anything that needs to be done
+                    # for the screensaver, like change the video on schedule
+                    screenWindow.check()
         except:
             log("VideoScreensaver ERROR: %s" % traceback.format_exc(), xbmc.LOGERROR)
 

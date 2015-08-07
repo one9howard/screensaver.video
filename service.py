@@ -29,3 +29,6 @@ if __name__ == '__main__':
     else:
         log("VideoScreensaverService: Setting volume to %s" % startupVol)
         xbmc.executebuiltin('SetVolume(%d)' % startupVol, True)
+
+    # Make sure that the settings have been updated correctly
+    Settings.cleanAddonSettings()
