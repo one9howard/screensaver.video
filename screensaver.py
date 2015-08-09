@@ -266,7 +266,6 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Check if we have a random start time
         if Settings.isRandomStart():
             startTime = random.randint(0, int(duration * 0.75))
-            startTime = duration - 5
 
         clockStart = Settings.getTimeForClock(filename, duration)
         if clockStart > 0:
