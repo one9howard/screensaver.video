@@ -32,3 +32,8 @@ if __name__ == '__main__':
 
     # Make sure that the settings have been updated correctly
     Settings.cleanAddonSettings()
+
+    # Check if we should start the screensaver video on startup
+    if Settings.isLaunchOnStartup():
+        log("VideoScreensaverService: Launching screensaver video on startup")
+        xbmc.executebuiltin('RunScript(%s)' % (os.path.join(__cwd__, "screensaver.py")))

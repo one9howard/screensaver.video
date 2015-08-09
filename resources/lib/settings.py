@@ -107,6 +107,10 @@ def list_dir(dirpath):
 # Stores Various Settings
 ##############################
 class Settings():
+    SCHEDULE_OFF = 0
+    SCHEDULE_SETTINGS = 1
+    SCHEDULE_FILE = 2
+
     # Locations:
     # ozibox.com
     #    Aquarium001.mkv
@@ -282,6 +286,10 @@ class Settings():
         return __addon__.getSetting("mediaPlayingBlock") == 'true'
 
     @staticmethod
+    def isLaunchOnStartup():
+        return __addon__.getSetting("launchOnStartup") == 'true'
+
+    @staticmethod
     def getVolume():
         if __addon__.getSetting("alterVolume") == 'false':
             return -1
@@ -365,8 +373,20 @@ class Settings():
         return startTime
 
     @staticmethod
+    def getScheduleSetting():
+        return int(__addon__.getSetting("scheduleSource"))
+
+    @staticmethod
+    def getScheduleFile():
+        if Settings.getScheduleSetting() == Settings.SCHEDULE_FILE:
+            return __addon__.getSetting("scheduleFile")
+        return None
+
+    @staticmethod
     def getNumberOfScheduleRules():
-        return int(__addon__.getSetting("numberOfSchuleRules"))
+        if Settings.getScheduleSetting() == Settings.SCHEDULE_SETTINGS:
+            return int(__addon__.getSetting("numberOfSchuleRules"))
+        return 0
 
     @staticmethod
     def getRuleVideoFile(ruleId):

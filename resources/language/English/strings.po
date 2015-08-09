@@ -52,7 +52,11 @@ msgctxt "#32007"
 msgid "Startup"
 msgstr ""
 
-#empty strings from id 32008 to 32019
+msgctxt "#32008"
+msgid "Launch Screensaver On Startup"
+msgstr ""
+
+#empty strings from id 32009 to 32019
 
 msgctxt "#32020"
 msgid "Preset Video"
@@ -82,7 +86,27 @@ msgctxt "#32026"
 msgid "Repeat One"
 msgstr ""
 
-#empty strings from id 32027 to 32049
+msgctxt "#32027"
+msgid "Schedule Settings"
+msgstr ""
+
+msgctxt "#32028"
+msgid "Off"
+msgstr ""
+
+msgctxt "#32029"
+msgid "Settings"
+msgstr ""
+
+msgctxt "#32030"
+msgid "File"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Schedule Settings File"
+msgstr ""
+
+#empty strings from id 32032 to 32049
 
 msgctxt "#32050"
 msgid "Set/Download Preset Video File"

@@ -1,5 +1,6 @@
 v1.2.0
 - Add scheduled video option
+- Add option to launch the screensaver on startup
 
 v1.1.8
 - Switch default downloads to server kindly provided by Ziggy

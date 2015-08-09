@@ -4,6 +4,7 @@ import os
 import random
 import time
 import traceback
+import xml.etree.ElementTree as ET
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -31,6 +32,7 @@ from settings import list_dir
 from settings import os_path_join
 from settings import dir_exists
 from settings import os_path_isfile
+from settings import os_path_split
 
 from VideoParser import VideoParser
 
@@ -187,6 +189,9 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
     # Generates the playlist to use for the screensaver
     def _getPlaylist(self):
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        # Note: The playlist clear option seems to creat all playlist settings,
+        # so will remove the repeat settings on a playlist that is currently playing,
+        # not just this instance - a bit nasty, but not much we can do about it
         playlist.clear()
 
         # Check to see if we should be using a video from the schedule
@@ -330,16 +335,17 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             xbmc.executebuiltin("PlayerControl(%s)" % repeatType)
 
     def check(self):
-        oldScheduleValue = self.currentScheduleItem
+        # Check to see if we should be changing the video for the schedule
+        scheduleEntry = self.scheduler.getScheduleEntry()
+        # There is an item scheduled, so check to see if the item has actually changed
+        if scheduleEntry == self.currentScheduleItem:
+            return None
+
+        log("Old Schedule %d different from new: %d" % (self.currentScheduleItem, scheduleEntry))
 
         # Check to see if there needs to be a change in what is playing
         # This will also update the schedule item so we know what has been selected
         newPlaylist = self._getPlaylist()
-
-        # Check to see if the scheduled item has changed, if it has not then
-        # there is nothing to do
-        if oldScheduleValue == self.currentScheduleItem:
-            return
 
         # If we reach here, there is a change of some sort
         if newPlaylist is not None:
@@ -418,29 +424,13 @@ class VolumeDrop(object):
 class Scheduler(object):
     def __init__(self, *args):
         self.scheduleDetails = []
+        self.idOffset = 0
+        self.lastScheduleModified = 0
 
-        # Collect together all of the scheduled videos
-        numScheduleEntries = Settings.getNumberOfScheduleRules()
-        log("Schedule: Number of schedule entries is %d" % numScheduleEntries)
-        itemNum = 1
-        while itemNum <= numScheduleEntries:
-            videoFile = Settings.getRuleVideoFile(itemNum)
-            if videoFile not in [None, ""]:
-                # Support special paths like smb:// means that we can not just call
-                # os.path.isfile as it will return false even if it is a file
-                # (A bit of a shame - but that's the way it is)
-                if videoFile.startswith("smb://") or os_path_isfile(videoFile):
-                    overlayFile = Settings.getRuleOverlayFile(itemNum)
-                    startTime = Settings.getRuleStartTime(itemNum)
-                    endTime = Settings.getRuleEndTime(itemNum)
-                    log("Schedule: Item %d (Start:%d, End:%d) contains video %s" % (itemNum, startTime, endTime, videoFile))
-                    details = {'id': itemNum, 'start': startTime, 'end': endTime, 'video': videoFile, 'overlay': overlayFile}
-                    self.scheduleDetails.append(details)
-                else:
-                    log("Schedule: File does not exist: %s" % videoFile)
-            else:
-                log("Schedule: Video file not set for entry %d" % itemNum)
-            itemNum = itemNum + 1
+        if Settings.getScheduleSetting() == Settings.SCHEDULE_SETTINGS:
+            self._loadFromSettings()
+        elif Settings.getScheduleSetting() == Settings.SCHEDULE_FILE:
+            self._loadFromFile()
 
     # Get the ID of which schedule should be used
     def getScheduleEntry(self):
@@ -448,10 +438,35 @@ class Scheduler(object):
         localTime = time.localtime()
         currentTime = (localTime.tm_hour * 60) + localTime.tm_min
 
+        # Check if we need to refresh the schedule details from the file
+        # in case they have changed
+        if Settings.getScheduleSetting() == Settings.SCHEDULE_FILE:
+            # Check if the file has changed
+            scheduleFileName = Settings.getScheduleFile()
+            if scheduleFileName not in [None, ""]:
+                if xbmcvfs.exists(scheduleFileName):
+                    statFile = xbmcvfs.Stat(scheduleFileName)
+                    modified = statFile.st_mtime()
+                    if modified != self.lastScheduleModified:
+                        log("Schedule: Schedule file has changed (%s)" % str(modified))
+                        # We use the offset to work out if the data has changed
+                        if self.idOffset > 0:
+                            self.idOffset = 0
+                        else:
+                            self.idOffset = 1000
+                        # Clear the existing schedule items
+                        self.scheduleDetails = []
+                        # Load the new schedule items
+                        self._loadFromFile()
+
         # Check the scheduled items to see if any cover the current time
         for item in self.scheduleDetails:
             if (item['start'] <= currentTime) and (item['end'] >= currentTime):
                 return item['id']
+            # Check for the case where the time laps over midnight
+            if item['start'] > item['end']:
+                if (currentTime >= item['start']) or (currentTime <= item['end']):
+                    return item['id']
 
         return -1
 
@@ -475,6 +490,122 @@ class Scheduler(object):
                     imageFile = item['overlay']
                 break
         return imageFile
+
+    def _loadFromSettings(self):
+        # Collect together all of the scheduled videos
+        numScheduleEntries = Settings.getNumberOfScheduleRules()
+        log("Schedule: Number of schedule entries is %d" % numScheduleEntries)
+        itemNum = self.idOffset + 1
+        while itemNum <= numScheduleEntries:
+            videoFile = Settings.getRuleVideoFile(itemNum)
+            if videoFile not in [None, ""]:
+                # Support special paths like smb:// means that we can not just call
+                # os.path.isfile as it will return false even if it is a file
+                # (A bit of a shame - but that's the way it is)
+                if videoFile.startswith("smb://") or os_path_isfile(videoFile):
+                    overlayFile = Settings.getRuleOverlayFile(itemNum)
+                    startTime = Settings.getRuleStartTime(itemNum)
+                    endTime = Settings.getRuleEndTime(itemNum)
+                    log("Schedule: Item %d (Start:%d, End:%d) contains video %s" % (itemNum, startTime, endTime, videoFile))
+                    details = {'id': itemNum, 'start': startTime, 'end': endTime, 'video': videoFile, 'overlay': overlayFile}
+                    self.scheduleDetails.append(details)
+                else:
+                    log("Schedule: File does not exist: %s" % videoFile)
+            else:
+                log("Schedule: Video file not set for entry %d" % itemNum)
+            itemNum = itemNum + 1
+
+    def _loadFromFile(self):
+        # Get the videos schedule that is stored in the file
+        scheduleFileName = Settings.getScheduleFile()
+        if scheduleFileName in [None, ""]:
+            log("Schedule: No schedule file set")
+            return
+
+        log("Schedule: Searching for schedule file: %s" % scheduleFileName)
+
+        # Return False if file does not exist
+        if not xbmcvfs.exists(scheduleFileName):
+            log("Schedule: No schedule file found: %s" % scheduleFileName)
+            return
+
+        # Save off the time this file was modified
+        statFile = xbmcvfs.Stat(scheduleFileName)
+        self.lastScheduleModified = statFile.st_mtime()
+        log("Schedule: Reading in schedule file with modify time: %s" % str(self.lastScheduleModified))
+
+        # The file exists, so start loading it
+        try:
+            # Need to first load the contents of the file into
+            # a string, this is because the XML File Parse option will
+            # not handle formats like smb://
+            scheduleFile = xbmcvfs.File(scheduleFileName, 'r')
+            scheduleFileStr = scheduleFile.read()
+            scheduleFile.close()
+
+            # Create an XML parser
+            scheduleXml = ET.ElementTree(ET.fromstring(scheduleFileStr))
+            rootElement = scheduleXml.getroot()
+
+            log("Schedule: Root element is = %s" % rootElement.tag)
+
+            # Check which format if being used
+            if rootElement.tag == "schedule":
+                log("Schedule: Schedule format file detected")
+                #    <schedule>
+                #        <rule start="14:24" end="14:37" video="video3.mkv" overlay="WindowFrame1.png" />
+                #    </schedule>
+
+                # Get the directory that the schedule file is in as this might be needed
+                # if we have local paths in the XML file
+                directory = os_path_split(scheduleFileName)[0]
+
+                # There could be multiple rule entries, so loop through all of them
+                itemNum = self.idOffset + 1
+                for ruleElem in scheduleXml.findall('rule'):
+                    if ruleElem is not None:
+                        videoFile = ruleElem.get('video', None)
+                        overlayFile = ruleElem.get('overlay', None)
+                        startTime = self._convertTimeToMinutes(ruleElem.get('start', "00:00"))
+                        endTime = self._convertTimeToMinutes(ruleElem.get('end', "00:00"))
+
+                    if (videoFile not in [None, ""]) and (startTime not in [None, ""]) and (endTime not in [None, ""]):
+                        # Make it a full path if it is not already
+                        if videoFile.startswith('..') or (("/" not in videoFile) and ("\\" not in videoFile)):
+                            videoFile = os_path_join(directory, videoFile)
+                        if overlayFile not in [None, ""]:
+                            if overlayFile.startswith('..') or (("/" not in overlayFile) and ("\\" not in overlayFile)):
+                                overlayFile = os_path_join(directory, overlayFile)
+                        log("Schedule File: Item %d (Start:%d, End:%d) contains video %s" % (itemNum, startTime, endTime, videoFile))
+
+                        # Support special paths like smb:// means that we can not just call
+                        # os.path.isfile as it will return false even if it is a file
+                        # (A bit of a shame - but that's the way it is)
+                        if videoFile.startswith("smb://") or os_path_isfile(videoFile):
+                            details = {'id': itemNum, 'start': startTime, 'end': endTime, 'video': videoFile, 'overlay': overlayFile}
+                            self.scheduleDetails.append(details)
+                        else:
+                            log("Schedule: File does not exist: %s" % videoFile)
+
+                        itemNum = itemNum + 1
+            else:
+                log("Schedule: Unknown schedule file format")
+
+            del scheduleXml
+        except:
+            log("Schedule: Failed to process schedule file: %s" % scheduleFileName, xbmc.LOGERROR)
+            log("Schedule: %s" % traceback.format_exc(), xbmc.LOGERROR)
+
+    # Converts the string format time (e.g. 14:10) to minutes
+    def _convertTimeToMinutes(self, strTime):
+        if strTime in [None, ""]:
+            log("Schedule: Time not set")
+            return None
+        strTimeSplit = strTime.split(':')
+        if len(strTimeSplit) < 2:
+            log("Schedule: Incorrect time format: %s" % strTime)
+            return None
+        return (int(strTimeSplit[0]) * 60) + int(strTimeSplit[1])
 
 
 ##################################
@@ -500,9 +631,9 @@ if __name__ == '__main__':
         try:
             # Now show the window and block until we exit
             screensaverTimeout = Settings.screensaverTimeout()
-            numScheduleEntries = Settings.getNumberOfScheduleRules()
+            scheduleSetting = Settings.getScheduleSetting()
 
-            if (screensaverTimeout < 1) and (numScheduleEntries < 1):
+            if (screensaverTimeout < 1) and (scheduleSetting == Settings.SCHEDULE_OFF):
                 log("Starting Screensaver in Modal Mode")
                 screenWindow.doModal()
             else:
