@@ -314,6 +314,10 @@ class Settings():
         return timoutSetting
 
     @staticmethod
+    def isShutdownAfterTimeout():
+        return __addon__.getSetting("stopAutomaticShutdown") == 'true'
+
+    @staticmethod
     def getFolderRepeatType():
         repeatType = Settings.REPEAT_TYPE[0]
         if __addon__.getSetting("videoSelection") == "1":

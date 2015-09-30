@@ -23,6 +23,7 @@
 		<setting id="dimLevel" type="slider" label="32058" range="0,1,14" option="int" default="0"/>
 		<setting id="stopAutomatic" type="bool" label="32059" default="false"/>
 		<setting id="stopAfter" subsetting="true" visible="eq(-1,true)" label="32060" type="slider" default="60" range="5,5,240" option="int"/>
+		<setting id="stopAutomaticShutdown" subsetting="true" visible="eq(-2,true)" type="bool" label="32009" default="false"/>
 	</category>
 	<category label="32007">
     	<setting id="resetVolumeOnStartup" type="bool" label="32061" default="false"/>

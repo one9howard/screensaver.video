@@ -56,7 +56,11 @@ msgctxt "#32008"
 msgid "Launch Screensaver On Startup"
 msgstr ""
 
-#empty strings from id 32009 to 32019
+msgctxt "#32009"
+msgid "Shutdown After Automatic Stop"
+msgstr ""
+
+#empty strings from id 32010 to 32019
 
 msgctxt "#32020"
 msgid "Preset Video"

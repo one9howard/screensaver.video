@@ -627,6 +627,7 @@ if __name__ == '__main__':
 
         xbmcgui.Window(10000).setProperty("VideoScreensaverRunning", "true")
 
+        didScreensaverTimeout = False
         try:
             # Now show the window and block until we exit
             screensaverTimeout = Settings.screensaverTimeout()
@@ -656,6 +657,12 @@ if __name__ == '__main__':
                             screenWindow.close()
                             # Reset the countdown to stop multiple closes being sent
                             countdown = 100
+                            # Record that the screensaver hit the timeout, this means that
+                            # we can then check to see if there is any action to perform
+                            # before we completely exit the screensaver script
+                            didScreensaverTimeout = True
+                            break
+
                     # Check to see if there is anything that needs to be done
                     # for the screensaver, like change the video on schedule
                     screenWindow.check()
@@ -665,4 +672,12 @@ if __name__ == '__main__':
         xbmcgui.Window(10000).clearProperty("VideoScreensaverRunning")
 
         del screenWindow
+
+        # Check if there are any actions to perform after a timeout occurs
+        if didScreensaverTimeout:
+            if Settings.isShutdownAfterTimeout():
+                log("Shutting down system after video screensaver timeout")
+                # Using ShutDown will perform the default behaviour that Kodi has in the system settings
+                xbmc.executebuiltin("ShutDown")
+
         log("Leaving Screensaver Script")
