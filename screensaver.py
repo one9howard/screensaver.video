@@ -213,31 +213,28 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         # Check if we are showing all the videos in a given folder
         elif Settings.isFolderSelection():
             videosFolder = Settings.getScreensaverFolder()
-            if (videosFolder is None):
-                videosFolder == ""
 
             # Check if we are dealing with a Folder of videos
-            if videosFolder != "" and dir_exists(videosFolder):
-                self.currentScheduleItem = -1
-                dirs, files = list_dir(videosFolder)
-                # Now shuffle the playlist to ensure that if there are more
-                #  than one video a different one starts each time
-                random.shuffle(files)
-                for vidFile in files:
-                    fullPath = os_path_join(videosFolder, vidFile)
-                    log("Screensaver video in directory is: %s" % fullPath)
-                    playlist.add(fullPath)
+            if videosFolder not in [None, ""]:
+                if dir_exists(videosFolder):
+                    self.currentScheduleItem = -1
+                    files = self._getAllFilesInDirectory(videosFolder)
+                    # Now shuffle the playlist to ensure that if there are more
+                    # than one video a different one starts each time
+                    random.shuffle(files)
+                    for vidFile in files:
+                        log("Screensaver video in directory is: %s" % vidFile)
+                        playlist.add(vidFile)
         else:
             # Must be dealing with a single file
             videoFile = Settings.getScreensaverVideo()
-            if (videoFile is None):
-                videoFile == ""
 
             # Check to make sure the screensaver video file exists
-            if (videoFile != "") and xbmcvfs.exists(videoFile):
-                self.currentScheduleItem = -1
-                log("Screensaver video is: %s" % videoFile)
-                playlist.add(videoFile)
+            if videoFile not in [None, ""]:
+                if xbmcvfs.exists(videoFile):
+                    self.currentScheduleItem = -1
+                    log("Screensaver video is: %s" % videoFile)
+                    playlist.add(videoFile)
 
         # If there are no videos in the playlist yet, then display an error
         if playlist.size() < 1:
@@ -251,6 +248,24 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             return None
 
         return playlist
+
+    # Get the files in the directory and all subdirectories
+    def _getAllFilesInDirectory(self, baseDir):
+        videoFiles = []
+        dirs, files = list_dir(baseDir)
+
+        # Get all the files in the current directory
+        for vidFile in files:
+            fullPath = os_path_join(baseDir, vidFile)
+            videoFiles.append(fullPath)
+
+        # Now check each directory
+        for aDir in dirs:
+            fullPath = os_path_join(baseDir, aDir)
+            dirContents = self._getAllFilesInDirectory(fullPath)
+            videoFiles = videoFiles + dirContents
+
+        return videoFiles
 
     # Apply any user setting to the created playlist
     def _updatePlaylistForSettings(self, playlist):
