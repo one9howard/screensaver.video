@@ -235,6 +235,13 @@ class Settings():
         return __addon__.getSetting("useFolder") == "true"
 
     @staticmethod
+    def isFolderNested():
+        nested = False
+        if Settings.isFolderSelection():
+            nested = __addon__.getSetting("screensaverFolderNested") == "true"
+        return nested
+
+    @staticmethod
     def setVideoSelectionPredefined():
         __addon__.setSetting("videoSelection", "0")
 

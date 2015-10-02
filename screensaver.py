@@ -260,10 +260,11 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
             videoFiles.append(fullPath)
 
         # Now check each directory
-        for aDir in dirs:
-            fullPath = os_path_join(baseDir, aDir)
-            dirContents = self._getAllFilesInDirectory(fullPath)
-            videoFiles = videoFiles + dirContents
+        if Settings.isFolderNested():
+            for aDir in dirs:
+                fullPath = os_path_join(baseDir, aDir)
+                dirContents = self._getAllFilesInDirectory(fullPath)
+                videoFiles = videoFiles + dirContents
 
         return videoFiles
 

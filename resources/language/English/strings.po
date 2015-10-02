@@ -60,7 +60,11 @@ msgctxt "#32009"
 msgid "Shutdown After Automatic Stop"
 msgstr ""
 
-#empty strings from id 32010 to 32019
+msgctxt "#32010"
+msgid "Include Nested Folders"
+msgstr ""
+
+#empty strings from id 32011 to 32019
 
 msgctxt "#32020"
 msgid "Preset Video"
