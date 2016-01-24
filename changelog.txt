@@ -1,3 +1,6 @@
+v1.3.0
+- Add support for scheduling by day
+
 v1.2.1 (2015-10-16)
 - Add option to shutdown after the screensaver is automatically stopped
 - Search sub-directories when custom folder location selected
