@@ -1,4 +1,4 @@
-v1.3.0
+v1.3.0 (2016-01-28)
 - Add support for scheduling by day
 
 v1.2.1 (2015-10-16)
