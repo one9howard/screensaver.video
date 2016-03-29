@@ -37,8 +37,8 @@ class CollectSets():
         collectionMap['Space'] = os_path_join(collectionsDir, 'space.xml')
         collectionMap['Waterfall'] = os_path_join(collectionsDir, 'waterfall.xml')
 
-        # TODO:
         # http://a1.phobos.apple.com/us/r1000/000/Features/atv/AutumnResources/videos/entries.json
+        collectionMap['Apple TV'] = os_path_join(collectionsDir, 'appletv.xml')
 
         # Check if the collections file exists
         if xbmcvfs.exists(self.collectSetsFile):
