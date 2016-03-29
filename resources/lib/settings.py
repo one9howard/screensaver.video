@@ -242,7 +242,15 @@ class Settings():
 
     @staticmethod
     def getScreensaverFolder():
-        return __addon__.getSetting("screensaverFolder").decode("utf-8")
+        screenFolder = __addon__.getSetting("screensaverFolder").decode("utf-8")
+
+        # If the screensaver folder has not been set yet, then set it to default
+        if screenFolder in [None, ""]:
+            addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
+            screenFolder = os_path_join(addonRootDir, 'videos')
+            __addon__.setSetting("screensaverFolder", screenFolder)
+
+        return screenFolder
 
     @staticmethod
     def setScreensaverFolder(screensaverFolder):

@@ -7,6 +7,9 @@
 	<extension point="xbmc.ui.screensaver" library="default.py"/>
   	<extension point="xbmc.python.script" library="screensaver.py"/>
 	<extension point="xbmc.service" library="service.py" start="login"/>
+	<extension point="xbmc.python.pluginsource" library="plugin.py">
+		<provides>video</provides>
+	</extension>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="bg">Скрийнсейвър, който възпроизвежда видео файлове</summary>
 		<summary lang="de">Bildschirmschoner, der eine Videodatei abspielt</summary>
