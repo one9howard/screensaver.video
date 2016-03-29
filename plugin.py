@@ -3,6 +3,7 @@ import sys
 import os
 import urllib
 import urlparse
+import traceback
 import xbmc
 import xbmcvfs
 import xbmcgui
@@ -97,7 +98,79 @@ class MenuNavigator():
         xbmcplugin.endOfDirectory(self.addon_handle)
 
     def download(self, name, filename, primary, secondary):
-        pass
+        log("VideoScreensaverPlugin: Downloading %s" % name)
+
+        tmpdestination = os_path_join(Settings.getTempFolder(), filename)
+        destination = os_path_join(Settings.getScreensaverFolder(), filename)
+
+        # Create a list of the links that can be used
+        downloadURLs = [primary, secondary]
+
+        # Check to see if there is already a file present
+        if xbmcvfs.exists(destination):
+            useExisting = xbmcgui.Dialog().yesno(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32301), name, __addon__.getLocalizedString(32302))
+            if useExisting:
+                # Don't want to overwrite, so nothing to do
+                log("Download: Reusing existing video file %s" % destination)
+                return
+            else:
+                log("Download: Removing existing file %s ready for fresh download" % destination)
+                xbmcvfs.delete(destination)
+
+        # Create a progress dialog for the  download
+        downloadProgressDialog = xbmcgui.DialogProgress()
+        downloadProgressDialog.create(__addon__.getLocalizedString(32303), name, filename, destination)
+
+        # Callback method to report progress
+        def _report_hook(count, blocksize, totalsize):
+            percent = int(float(count * blocksize * 100) / totalsize)
+            downloadProgressDialog.update(percent, name, filename, destination)
+
+        showError = False
+        downloadOK = False
+        for downloadURL in downloadURLs:
+            try:
+                log("Download: Using server: %s" % downloadURL)
+
+                # Now retrieve the actual file
+                fp, h = urllib.urlretrieve(downloadURL, tmpdestination, _report_hook)
+                log(h)
+
+                # Check to make sure that the file created downloaded correctly
+                st = xbmcvfs.Stat(tmpdestination)
+                fileSize = st.st_size()
+                log("Download: Size of file %s is %d" % (tmpdestination, fileSize))
+                # Check for something that has a size greater than zero (in case some OSs do not
+                # support looking at the size), but less that 1,000,000 (As all our files are
+                # larger than that
+                if (fileSize > 0) and (fileSize < 1000000):
+                    log("Download: Detected that file %s did not download correctly as file size is only %d" % (downloadURL, fileSize))
+                    if showError:
+                        xbmcgui.Dialog().ok(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32306), __addon__.getLocalizedString(32307))
+                else:
+                    log("Download: Copy from %s to %s" % (tmpdestination, destination))
+                    copy = xbmcvfs.copy(tmpdestination, destination)
+                    if copy:
+                        log("Download: Copy Successful")
+                        downloadOK = True
+                    else:
+                        log("Download: Copy Failed")
+                xbmcvfs.delete(tmpdestination)
+            except:
+                log("Download: Theme download Failed!!!", xbmc.LOGERROR)
+                log("Download: %s" % traceback.format_exc(), xbmc.LOGERROR)
+                if not showError:
+                    log("Download: Trying different server", xbmc.LOGERROR)
+            # If we have downloaded OK, there is no need to loop
+            if downloadOK:
+                break
+            # If the second option fails then show the error
+            showError = True
+
+        # Make sure the progress dialog has been closed
+        downloadProgressDialog.close()
+        # Now reload the screen to reflect the change
+        xbmc.executebuiltin("Container.Refresh")
 
 
 ######################################

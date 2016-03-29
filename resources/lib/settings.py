@@ -83,7 +83,7 @@ def os_path_isfile(workingPath,):
 def dir_exists(dirpath):
     directoryPath = dirpath
     # The xbmcvfs exists interface require that directories end in a slash
-    # It used to be OK not to have the slash in Gotham, but it is now required
+    # It used to be OK not to have the slash in Gothan, but it is now required
     if (not directoryPath.endswith("/")) and (not directoryPath.endswith("\\")):
         dirSep = "/"
         if "\\" in directoryPath:
@@ -119,75 +119,6 @@ class Settings():
     FRIDAY = 4
     SATURDAY = 5
     SUNDAY = 6
-
-    # Locations:
-    # ozibox.com
-    #    Aquarium001.mkv
-    #    Aquarium004-720p.mp4
-    #    Beach002-720p.mp4
-    #    Christmas001-1080p.mp4
-    #    Clock001-720p.mp4
-    #    Clock002-360p.mp4
-    #    Fireplace001-720p.mkv
-    #    Fireplace002.mkv
-    #    JohnnyCastaway001-480.mp4
-    #    Matrix001-720.mp4
-    #    Ocean001-720p.mp4
-    #    RetroSciFi-001-1080p.mp4
-    #    Snow001-720p.mp4
-    #    Snow002-1080p.mp4
-    #    Snow003-1080p.mp4
-    #    Space001-720p.mp4
-    #    Space002-1080p.mp4
-    #    StarTrekTNG-001-720p.mp4
-    #    Woodland001-720p.mp4
-    #    Waterfall001-720p.mp4
-    #    Waterfall002-720p.mp4
-    #    Watermill001-1080p.mp4
-    #
-    # copy.com
-    #    Aquarium002-720p.mkv
-    #    Aquarium003-720p.mp4
-    #    Aquarium005-720p.mkv
-    #    Beach001-720p.mp4
-    #    Beach003-720p.mp4
-    #    Fireplace003-1080p.mkv
-    #    Fireplace004-720p.mp4
-    #    Space003-720p.mkv
-    #    Waterfall003-720p.mp4
-    PRESET_VIDEOS = (
-        [32101, "Aquarium001.mkv", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD03QTcyNTkyQTNBNUE0QTVRUVdFMjAxMTY2N0VXUVM="],
-        [32102, "Aquarium002-720p.mkv", "aHR0cDovL2NvcHkuY29tL2NlbXZGQ213M016SVhOMU8/ZG93bmxvYWQ9MQ=="],
-        [32106, "Aquarium003-720p.mp4", "aHR0cDovL2NvcHkuY29tLzFkaUJkN3Z6SWt3ZFpDdVQ/ZG93bmxvYWQ9MQ=="],
-        [32124, "Aquarium004-720p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvQ0NCNDY2NDEzQTVBNEE1UVFXRTEzMDY2OTlFV1FTL0FxdWFyaXVtMDA0LTcyMHAubXA0"],
-        [32128, "Aquarium005-720p.mkv", "aHR0cDovL2NvcHkuY29tL0Y4NnRrUU9kR3hRVEVBR1Q/ZG93bmxvYWQ9MQ=="],
-        [32109, "Beach001-720p.mp4", "aHR0cDovL2NvcHkuY29tL1VvRE1OZ0JWajBmTVFxeFY/ZG93bmxvYWQ9MQ=="],
-        [32110, "Beach002-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD1CN0U5RjZDRTNBNUE0QTVRUVdFMjEwMzI1MUVXUVM="],
-        [32119, "Beach003-720p.mp4", "aHR0cDovL2NvcHkuY29tL0t0OVFsNlVlVEVLR09vZXU/ZG93bmxvYWQ9MQ=="],
-        [32125, "Christmas001-1080p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvQjE0NEQ1MDIzQTVBNEE1UVFXRTEzMDY3MDJFV1FTL0NocmlzdG1hczAwMS0xMDgwcC5tcDQ="],
-        [32130, "Clock001-720p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvRDZBRjc2MEEzQTVBNEE1UVFXRTE1MDM1OTRFV1FTL0Nsb2NrMDAxLTcyMHAubXA0"],
-        [32131, "Clock002-360p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvQjFDMjJCNTMzQTVBNEE1UVFXRTE1MDM1OThFV1FTL0Nsb2NrMDAyLTM2MHAubXA0"],
-        [32103, "Fireplace001-720p.mkv", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD1ENzMwODE2OTNBNUE0QTVRUVdFMjAxMTcyOUVXUVM="],
-        [32104, "Fireplace002.mkv", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD05QkRBRDdDODNBNUE0QTVRUVdFMjAxMTY4OUVXUVM="],
-        [32105, "Fireplace003-1080p.mkv", "aHR0cDovL2NvcHkuY29tL1dzZEcwdmZ0cWl2V3NqWUQ/ZG93bmxvYWQ9MQ=="],
-        [32107, "Fireplace004-720p.mp4", "aHR0cDovL2NvcHkuY29tL2I2VlJ6UTFYeEVmSXhwU0g/ZG93bmxvYWQ9MQ=="],
-        [32126, "JohnnyCastaway001-480.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvODU1RDlBMDQzQTVBNEE1UVFXRTEzMDY2ODhFV1FTL0pvaG5ueUNhc3Rhd2F5MDAxLTQ4MC5tcDQ="],
-        [32111, "Matrix001-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD05RTczMTM0QjNBNUE0QTVRUVdFMjEwMzMyN0VXUVM="],
-        [32127, "Ocean001-720p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvMjI2NzJBNzczQTVBNEE1UVFXRTEzMTg1NDlFV1FTL09jZWFuMDAxLTcyMHAubXA0"],
-        [32115, "RetroSciFi-001-1080p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD02QjVCNzREQzNBNUE0QTVRUVdFMjEwNDA4N0VXUVM="],
-        [32120, "Snow001-720p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvRjI5QkZFQzIzQTVBNEE1UVFXRTk0MTMzN0VXUVMvU25vdzAwMS03MjBwLm1wNA=="],
-        [32121, "Snow002-1080p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlSGFzaC85MEE1NjhDRDNBNUE0QTVRUVdFMjc3ODg4N0VXUVMvU25vdzAwMi0xMDgwcC5tcDQ="],
-        [32122, "Snow003-720p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvQjE0RUE1NDYzQTVBNEE1UVFXRTk0MTQ3MkVXUVMvU25vdzAwMy03MjBwLm1wNA=="],
-        [32108, "Space001-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD1EQ0E4OTFEMTNBNUE0QTVRUVdFMjAxMTc3NkVXUVM="],
-        [32112, "Space002-1080p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD00NDQxQ0JCNTNBNUE0QTVRUVdFMjEwMzA4OUVXUVM="],
-        [32129, "Space003-720p.mp4", "aHR0cDovL2NvcHkuY29tL3NEZDByM0gxRldZVGptUjk/ZG93bmxvYWQ9MQ=="],
-        [32114, "StarTrekTNG-001-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD1FM0VFRTkyNzNBNUE0QTVRUVdFMjEwNDA4NEVXUVM="],
-        [32116, "Waterfall001-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD0wNDk1NDU5RTNBNUE0QTVRUVdFMjExNTk2N0VXUVM="],
-        [32117, "Waterfall002-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD0wQTRGQjAxMjNBNUE0QTVRUVdFMjExNTk4NUVXUVM="],
-        [32118, "Waterfall003-720p.mp4", "aHR0cDovL2NvcHkuY29tL20xcnNFVXhjVXlBTWVOaGM/ZG93bmxvYWQ9MQ=="],
-        [32123, "Watermill001-1080p.mp4", "aHR0cDovLzE3OC4zMy42My42OC9wdXRzdG9yYWdlL0Rvd25sb2FkRmlsZUhhc2gvQTRDNzMxNkYzQTVBNEE1UVFXRTk0MTQ0OEVXUVMvV2F0ZXJtaWxsMDAxLTEwODBwLm1wNA=="],
-        [32113, "Woodland001-720p.mp4", "aHR0cDovLzE3OC4zMy42MS42L3B1dHN0b3JhZ2UvRG93bmxvYWRGaWxlLmFzaHg/RG93bmxvYWRGaWxlSGFzaD0xODFDMjE1QjNBNUE0QTVRUVdFMjEwMzMyOUVXUVM="]
-    )
 
     DIM_LEVEL = (
         '00000000',
@@ -231,14 +162,12 @@ class Settings():
     )
 
     @staticmethod
-    def getScreensaverVideo():
-        return __addon__.getSetting("screensaverFile").decode("utf-8")
+    def isFolderSelection():
+        return __addon__.getSetting("useFolder") == "true"
 
     @staticmethod
-    def setScreensaverVideo(screensaverFile):
-        __addon__.setSetting("useFolder", "false")
-        __addon__.setSetting("screensaverFile", screensaverFile)
-        __addon__.setSetting("screensaverFolder", "")
+    def getScreensaverVideo():
+        return __addon__.getSetting("screensaverFile").decode("utf-8")
 
     @staticmethod
     def getScreensaverFolder():
@@ -250,17 +179,26 @@ class Settings():
             screenFolder = os_path_join(addonRootDir, 'videos')
             __addon__.setSetting("screensaverFolder", screenFolder)
 
+            # Make sure the screensaver folder exists, if not, createe it
+            if not dir_exists(addonRootDir):
+                xbmcvfs.mkdir(addonRootDir)
+            if not dir_exists(screenFolder):
+                xbmcvfs.mkdir(screenFolder)
+
         return screenFolder
 
     @staticmethod
-    def setScreensaverFolder(screensaverFolder):
-        __addon__.setSetting("useFolder", "true")
-        __addon__.setSetting("screensaverFolder", screensaverFolder)
-        __addon__.setSetting("screensaverFile", "")
+    def getTempFolder():
+        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
+        tempDir = os_path_join(addonRootDir, 'temp')
 
-    @staticmethod
-    def isFolderSelection():
-        return __addon__.getSetting("useFolder") == "true"
+        # Make sure the screensaver folder exists, if not, createe it
+        if not dir_exists(addonRootDir):
+            xbmcvfs.mkdir(addonRootDir)
+        if not dir_exists(tempDir):
+            xbmcvfs.mkdir(tempDir)
+
+        return tempDir
 
     @staticmethod
     def isFolderNested():
@@ -270,23 +208,11 @@ class Settings():
         return nested
 
     @staticmethod
-    def setVideoSelectionPredefined():
-        __addon__.setSetting("videoSelection", "0")
-
-    @staticmethod
     def cleanAddonSettings():
-        # We do this because this is a display field and if a user
-        # 1) Selects the "Manual Define"
-        # 2) Select a custom video
-        # 3) Returns to "Built in Videos"
-        # Then it will show the last built in video, which is not accurate
-        if __addon__.getSetting("videoSelection") == "1":
-            __addon__.setSetting("displaySelected", "")
-
         # Set the default values for the schedule screensaver folders
         defaultFolder = Settings.getScreensaverFolder()
         if defaultFolder not in [None, ""]:
-            # Make sure the directory path ends with a seperator, otherwise it
+            # Make sure the directory path ends with a separator, otherwise it
             # will show the parent path
             if (not defaultFolder.endswith("/")) and (not defaultFolder.endswith("\\")):
                 dirSep = "/"
@@ -299,14 +225,6 @@ class Settings():
                 if __addon__.getSetting(videoFileTag) in [None, ""]:
                     __addon__.setSetting(videoFileTag, defaultFolder)
                 ruleNum = ruleNum + 1
-
-    @staticmethod
-    def setPresetVideoSelected(id):
-        if id is not None:
-            if id != -1:
-                __addon__.setSetting("displaySelected", __addon__.getLocalizedString(Settings.PRESET_VIDEOS[id][0]))
-            else:
-                __addon__.setSetting("displaySelected", __addon__.getLocalizedString(32100))
 
     @staticmethod
     def isShowTime():
