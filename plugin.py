@@ -90,6 +90,8 @@ class MenuNavigator():
                 if xbmcvfs.exists(videoLocation):
                     li.setInfo('video', {'PlayCount': 1})
 
+            li.addContextMenuItems(self._getContextMenu(videoItem), replaceItems=True)
+
             # TODO: Also add an option to delete
             url = self._build_url({'mode': 'download', 'name': videoItem['name'], 'filename': videoItem['filename'], 'primary': videoItem['primary'], 'secondary': videoItem['secondary']})
 
@@ -172,6 +174,56 @@ class MenuNavigator():
         # Now reload the screen to reflect the change
         xbmc.executebuiltin("Container.Refresh")
 
+    # Delete an existing file
+    def delete(self, name, filename):
+        log("VideoScreensaverPlugin: Deleting %s" % name)
+
+        destination = os_path_join(Settings.getScreensaverFolder(), filename)
+
+        # Check to see if there is already a file present
+        if xbmcvfs.exists(destination):
+            deleteFile = xbmcgui.Dialog().yesno(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32014), name)
+            if deleteFile:
+                log("Download: Removing existing file %s" % destination)
+                xbmcvfs.delete(destination)
+                # Now reload the screen to reflect the change
+                xbmc.executebuiltin("Container.Refresh")
+        else:
+            log("VideoScreensaverPlugin: Files does not exists %s" % destination)
+
+    def play(self, name, filename):
+        log("VideoScreensaverPlugin: Playing %s" % name)
+
+        destination = os_path_join(Settings.getScreensaverFolder(), filename)
+
+        # Check to see if there is already a file present
+        if xbmcvfs.exists(destination):
+            player = xbmc.Player()
+            player.play(destination)
+            del player
+        else:
+            log("VideoScreensaverPlugin: Files does not exists %s" % destination)
+
+    # Construct the context menu
+    def _getContextMenu(self, videoItem):
+        ctxtMenu = []
+
+        # Check if the file has already been downloaded
+        destination = os_path_join(Settings.getScreensaverFolder(), videoItem['filename'])
+        if not xbmcvfs.exists(destination):
+            # If not already exists, add a download option
+            cmd = self._build_url({'mode': 'download', 'name': videoItem['name'], 'filename': videoItem['filename'], 'primary': videoItem['primary'], 'secondary': videoItem['secondary']})
+            ctxtMenu.append((__addon__.getLocalizedString(32013), 'RunPlugin(%s)' % cmd))
+        else:
+            # If already exists then add a play option
+            cmd = self._build_url({'mode': 'play', 'name': videoItem['name'], 'filename': videoItem['filename']})
+            ctxtMenu.append((__addon__.getLocalizedString(32015), 'RunPlugin(%s)' % cmd))
+            # If already exists then add a delete option
+            cmd = self._build_url({'mode': 'delete', 'name': videoItem['name'], 'filename': videoItem['filename']})
+            ctxtMenu.append((__addon__.getLocalizedString(32014), 'RunPlugin(%s)' % cmd))
+
+        return ctxtMenu
+
 
 ######################################
 # Main of the VideoScreensaver Plugin
@@ -241,4 +293,40 @@ if __name__ == '__main__':
 
         menuNav = MenuNavigator(base_url, addon_handle)
         menuNav.download(name, filename, primary, secondary)
+        del menuNav
+
+    elif mode[0] == 'delete':
+        log("VideoScreensaverPlugin: Mode is delete")
+
+        name = ''
+        filename = None
+
+        nameItem = args.get('name', None)
+        if (nameItem is not None) and (len(nameItem) > 0):
+            name = nameItem[0]
+
+        filenameItem = args.get('filename', None)
+        if (filenameItem is not None) and (len(filenameItem) > 0):
+            filename = filenameItem[0]
+
+        menuNav = MenuNavigator(base_url, addon_handle)
+        menuNav.delete(name, filename)
+        del menuNav
+
+    elif mode[0] == 'play':
+        log("VideoScreensaverPlugin: Mode is play")
+
+        name = ''
+        filename = None
+
+        nameItem = args.get('name', None)
+        if (nameItem is not None) and (len(nameItem) > 0):
+            name = nameItem[0]
+
+        filenameItem = args.get('filename', None)
+        if (filenameItem is not None) and (len(filenameItem) > 0):
+            filename = filenameItem[0]
+
+        menuNav = MenuNavigator(base_url, addon_handle)
+        menuNav.play(name, filename)
         del menuNav

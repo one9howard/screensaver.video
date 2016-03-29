@@ -1,3 +1,9 @@
+v1.4.0
+- Rework screensaver selection and download support
+- Allow custom target download folder to be set
+TODO: Disable video from being included
+TODO: Add custom collections
+
 v1.3.0 (2016-01-28)
 - Add support for scheduling by day
 
