@@ -78,6 +78,8 @@ class MenuNavigator():
 
             # Create the list-item for this video
             li = xbmcgui.ListItem(displayName, iconImage=videoItem['image'])
+            if videoItem['duration'] not in [None, "", 0]:
+                li.setInfo('video', {'Duration': videoItem['duration']})
 
             # Set the background image
 #             if videoItem['fanart'] is not None:

@@ -84,7 +84,7 @@ class CollectSets():
 
             # Get the videos that are in the collection
             for elemItem in collectionElem.findall('video'):
-                video = {'name': None, 'filename': None, 'image': __icon__, 'primary': None, 'secondary': None, 'enabled': True}
+                video = {'name': None, 'filename': None, 'image': __icon__, 'duration': None, 'primary': None, 'secondary': None, 'enabled': True}
 
                 nameElem = elemItem.find('name')
                 if nameElem not in [None, ""]:
@@ -97,6 +97,10 @@ class CollectSets():
                 imageElem = elemItem.find('image')
                 if imageElem not in [None, ""]:
                     video['image'] = imageElem.text
+
+                durationElem = elemItem.find('duration')
+                if durationElem not in [None, "", 0]:
+                    video['duration'] = int(durationElem.text)
 
                 primaryElem = elemItem.find('primary')
                 if nameElem not in [None, ""]:
