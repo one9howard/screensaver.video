@@ -92,6 +92,10 @@ msgctxt "#32018"
 msgid "Enable"
 msgstr ""
 
+msgctxt "#32019"
+msgid "Preview"
+msgstr ""
+
 #empty strings from id 32019 to 32022
 
 msgctxt "#32023"

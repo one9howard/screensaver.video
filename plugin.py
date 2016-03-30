@@ -195,10 +195,14 @@ class MenuNavigator():
     def play(self, name, filename):
         log("VideoScreensaverPlugin: Playing %s" % name)
 
-        destination = os_path_join(Settings.getScreensaverFolder(), filename)
+        destination = filename
+        if not filename.startswith('http'):
+            destination = os_path_join(Settings.getScreensaverFolder(), filename)
+            if not xbmcvfs.exists(destination):
+                destination = None
 
         # Check to see if there is already a file present
-        if xbmcvfs.exists(destination):
+        if destination not in [None, ""]:
             player = xbmc.Player()
             player.play(destination)
             del player
@@ -238,6 +242,9 @@ class MenuNavigator():
             # If not already exists, add a download option
             cmd = self._build_url({'mode': 'download', 'name': videoItem['name'], 'filename': videoItem['filename'], 'primary': videoItem['primary'], 'secondary': videoItem['secondary']})
             ctxtMenu.append((__addon__.getLocalizedString(32013), 'RunPlugin(%s)' % cmd))
+            # If not already exists, add a download option
+            cmd = self._build_url({'mode': 'play', 'name': videoItem['name'], 'filename': videoItem['primary']})
+            ctxtMenu.append((__addon__.getLocalizedString(32019), 'RunPlugin(%s)' % cmd))
         else:
             # If already exists then add a play option
             cmd = self._build_url({'mode': 'play', 'name': videoItem['name'], 'filename': videoItem['filename']})
