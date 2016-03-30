@@ -18,6 +18,7 @@ class CollectSets():
     def __init__(self):
         addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
         self.collectSetsFile = os_path_join(addonRootDir, 'collectsets.xml')
+        self.disabledVideosFile = os_path_join(addonRootDir, 'disabled.xml')
         self.tempDir = os_path_join(addonRootDir, 'temp')
         self.videoDir = os_path_join(addonRootDir, 'videos')
 
@@ -62,7 +63,6 @@ class CollectSets():
 
             collectionElem = ET.ElementTree(ET.fromstring(collectionStr))
 
-            # Check if the library is currently disabled
             collectionName = collectionElem.find('collection')
             if collectionName in [None, ""]:
                 return None
@@ -114,3 +114,36 @@ class CollectSets():
             log("CollectSets: %s" % traceback.format_exc(), xbmc.LOGERROR)
 
         return collectionDetails
+
+    # Gets the files that have been recorded as disabled
+    def getDisabledVideos(self):
+        # Check if the disabled videos file exists
+        if not xbmcvfs.exists(self.disabledVideosFile):
+            log("CollectSets: No disabled videos file exists")
+            return []
+
+        disabledVideos = []
+        try:
+            # Load the file as a string
+            disabledVideosFileRef = xbmcvfs.File(self.disabledVideosFile, 'r')
+            disabledVideosStr = disabledVideosFileRef.read()
+            disabledVideosFileRef.close()
+
+            disabledVideosElem = ET.ElementTree(ET.fromstring(disabledVideosStr))
+
+            # Expected XML format:
+            # <disabled_screensaver>
+            #     <filename></filename>
+            # </disabled_screensaver>
+
+            # Get the videos that are in the disabled list
+            for filenameItem in disabledVideosElem.getroot().findall('filename'):
+                disabledFile = filenameItem.text
+
+                log("CollectSets: Disabled video file: %s" % disabledFile)
+                disabledVideos.append(disabledFile)
+        except:
+            log("CollectSets: Failed to read collection file %s" % self.disabledVideosFile, xbmc.LOGERROR)
+            log("CollectSets: %s" % traceback.format_exc(), xbmc.LOGERROR)
+
+        return disabledVideos

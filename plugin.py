@@ -63,6 +63,7 @@ class MenuNavigator():
 
         collectionCtrl = CollectSets()
         collectionDetails = collectionCtrl.loadCollection(link)
+        disabledVideos = collectionCtrl.getDisabledVideos()
         del collectionCtrl
 
         # If the file was not processed just don't display anything
@@ -72,10 +73,12 @@ class MenuNavigator():
         screensaverFolder = Settings.getScreensaverFolder()
 
         for videoItem in collectionDetails['videos']:
+            displayName = videoItem['name']
+            if videoItem['filename'] in disabledVideos:
+                displayName = "%s %s" % (__addon__.getLocalizedString(32016), displayName)
+
             # Create the list-item for this video
-            li = xbmcgui.ListItem(videoItem['name'], iconImage=videoItem['image'])
-            # Remove the default context menu
-            li.addContextMenuItems([], replaceItems=True)
+            li = xbmcgui.ListItem(displayName, iconImage=videoItem['image'])
 
             # Set the background image
 #             if videoItem['fanart'] is not None:
@@ -86,7 +89,7 @@ class MenuNavigator():
             if screensaverFolder not in [None, ""]:
                 videoLocation = os_path_join(screensaverFolder, videoItem['filename'])
 
-                log("VideoScreensaverPlugin: Checking id %s already downloaded to %s" % (videoItem['filename'], videoLocation))
+                log("VideoScreensaverPlugin: Checking if %s already downloaded to %s" % (videoItem['filename'], videoLocation))
                 if xbmcvfs.exists(videoLocation):
                     li.setInfo('video', {'PlayCount': 1})
 
