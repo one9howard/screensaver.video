@@ -1,8 +1,10 @@
 v1.4.0
 - Rework screensaver selection and download support
 - Allow custom target download folder to be set
-TODO: Disable video from being included
+- Allow downloaded videos to be disabled from the screensaver selection
+TODO: Disable collections videos in one go
 TODO: Add custom collections (Context menu to remove)
+TODO: Add video duration
 
 v1.3.0 (2016-01-28)
 - Add support for scheduling by day

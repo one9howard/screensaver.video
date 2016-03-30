@@ -35,6 +35,7 @@ from settings import os_path_isfile
 from settings import os_path_split
 
 from VideoParser import VideoParser
+from collectSets import CollectSets
 
 
 # Video Screensaver Player that can detect when the next item in a playlist starts
@@ -254,8 +255,18 @@ class ScreensaverWindow(xbmcgui.WindowXMLDialog):
         videoFiles = []
         dirs, files = list_dir(baseDir)
 
+        # Get the list of files that are to be excluded
+        collectionCtrl = CollectSets()
+        disabledVideos = collectionCtrl.getDisabledVideos()
+        del collectionCtrl
+
         # Get all the files in the current directory
         for vidFile in files:
+            # Check if this file is excluded
+            if vidFile in disabledVideos:
+                log("Ignoring disabled screensaver video %s" % vidFile)
+                continue
+
             fullPath = os_path_join(baseDir, vidFile)
             videoFiles.append(fullPath)
 
