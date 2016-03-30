@@ -63,7 +63,6 @@ class MenuNavigator():
 
         collectionCtrl = CollectSets()
         collectionDetails = collectionCtrl.loadCollection(link)
-        disabledVideos = collectionCtrl.getDisabledVideos()
         del collectionCtrl
 
         # If the file was not processed just don't display anything
@@ -74,7 +73,7 @@ class MenuNavigator():
 
         for videoItem in collectionDetails['videos']:
             displayName = videoItem['name']
-            if videoItem['filename'] in disabledVideos:
+            if videoItem['enabled'] is False:
                 displayName = "%s %s" % (__addon__.getLocalizedString(32016), displayName)
 
             # Create the list-item for this video
@@ -95,7 +94,6 @@ class MenuNavigator():
 
             li.addContextMenuItems(self._getContextMenu(videoItem), replaceItems=True)
 
-            # TODO: Also add an option to delete
             url = self._build_url({'mode': 'download', 'name': videoItem['name'], 'filename': videoItem['filename'], 'primary': videoItem['primary'], 'secondary': videoItem['secondary']})
 
             xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=False)
@@ -207,6 +205,29 @@ class MenuNavigator():
         else:
             log("VideoScreensaverPlugin: Files does not exists %s" % destination)
 
+    def enable(self, filename, disable):
+        log("VideoScreensaverPlugin: Enable toggle %s" % filename)
+
+        # Get the current list of disabled items
+        collectionCtrl = CollectSets()
+        disabledVideos = collectionCtrl.getDisabledVideos()
+
+        # Check if we are adding or removing from the list
+        if disable == 'false':
+            if filename in disabledVideos:
+                log("VideoScreensaverPlugin: Removing %s from the disabled videos" % filename)
+                disabledVideos.remove(filename)
+        else:
+            if filename not in disabledVideos:
+                log("VideoScreensaverPlugin: Adding %s to the disabled videos" % filename)
+                disabledVideos.append(filename)
+
+        collectionCtrl.saveDisabledVideos(disabledVideos)
+        del collectionCtrl
+
+        # Now reload the screen to reflect the change
+        xbmc.executebuiltin("Container.Refresh")
+
     # Construct the context menu
     def _getContextMenu(self, videoItem):
         ctxtMenu = []
@@ -224,6 +245,14 @@ class MenuNavigator():
             # If already exists then add a delete option
             cmd = self._build_url({'mode': 'delete', 'name': videoItem['name'], 'filename': videoItem['filename']})
             ctxtMenu.append((__addon__.getLocalizedString(32014), 'RunPlugin(%s)' % cmd))
+
+            # Check if we need a menu item to enable and disable the videos
+            if videoItem['enabled']:
+                cmd = self._build_url({'mode': 'enable', 'disable': 'true', 'filename': videoItem['filename']})
+                ctxtMenu.append((__addon__.getLocalizedString(32017), 'RunPlugin(%s)' % cmd))
+            else:
+                cmd = self._build_url({'mode': 'enable', 'disable': 'false', 'filename': videoItem['filename']})
+                ctxtMenu.append((__addon__.getLocalizedString(32018), 'RunPlugin(%s)' % cmd))
 
         return ctxtMenu
 
@@ -332,4 +361,22 @@ if __name__ == '__main__':
 
         menuNav = MenuNavigator(base_url, addon_handle)
         menuNav.play(name, filename)
+        del menuNav
+
+    elif mode[0] == 'enable':
+        log("VideoScreensaverPlugin: Mode is enable")
+
+        filename = None
+        disable = 'false'
+
+        filenameItem = args.get('filename', None)
+        if (filenameItem is not None) and (len(filenameItem) > 0):
+            filename = filenameItem[0]
+
+        disableItem = args.get('disable', None)
+        if (disableItem is not None) and (len(disableItem) > 0):
+            disable = disableItem[0]
+
+        menuNav = MenuNavigator(base_url, addon_handle)
+        menuNav.enable(filename, disable)
         del menuNav

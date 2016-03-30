@@ -84,7 +84,15 @@ msgctxt "#32016"
 msgid "[Disabled]"
 msgstr ""
 
-#empty strings from id 32017 to 32022
+msgctxt "#32017"
+msgid "Disable"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Enable"
+msgstr ""
+
+#empty strings from id 32019 to 32022
 
 msgctxt "#32023"
 msgid "Use All Files In A Folder"

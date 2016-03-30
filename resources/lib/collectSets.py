@@ -8,6 +8,7 @@ import xbmcvfs
 
 __addon__ = xbmcaddon.Addon(id='screensaver.video')
 __addonid__ = __addon__.getAddonInfo('id')
+__icon__ = __addon__.getAddonInfo('icon')
 
 # Import the common settings
 from settings import log
@@ -54,6 +55,9 @@ class CollectSets():
             log("CollectSets: Failed to load collection file: %s" % collectionFile, xbmc.LOGERROR)
             return None
 
+        # Load all of the videos that are disabled
+        disabledVideos = self.getDisabledVideos()
+
         collectionDetails = None
         try:
             # Load the file as a string
@@ -80,7 +84,7 @@ class CollectSets():
 
             # Get the videos that are in the collection
             for elemItem in collectionElem.findall('video'):
-                video = {'name': None, 'filename': None, 'image': None, 'primary': None, 'secondary': None}
+                video = {'name': None, 'filename': None, 'image': __icon__, 'primary': None, 'secondary': None, 'enabled': True}
 
                 nameElem = elemItem.find('name')
                 if nameElem not in [None, ""]:
@@ -108,6 +112,10 @@ class CollectSets():
                     else:
                         video['secondary'] = secondaryElem.text
 
+                # Check if this video is in the disabled list
+                if video['filename'] in disabledVideos:
+                    video['enabled'] = False
+
                 collectionDetails['videos'].append(video)
         except:
             log("CollectSets: Failed to read collection file %s" % collectionFile, xbmc.LOGERROR)
@@ -117,12 +125,12 @@ class CollectSets():
 
     # Gets the files that have been recorded as disabled
     def getDisabledVideos(self):
+        disabledVideos = []
         # Check if the disabled videos file exists
         if not xbmcvfs.exists(self.disabledVideosFile):
             log("CollectSets: No disabled videos file exists")
-            return []
+            return disabledVideos
 
-        disabledVideos = []
         try:
             # Load the file as a string
             disabledVideosFileRef = xbmcvfs.File(self.disabledVideosFile, 'r')
@@ -146,4 +154,26 @@ class CollectSets():
             log("CollectSets: Failed to read collection file %s" % self.disabledVideosFile, xbmc.LOGERROR)
             log("CollectSets: %s" % traceback.format_exc(), xbmc.LOGERROR)
 
+        log("CollectSets: Number of disabled videos is %d" % len(disabledVideos))
         return disabledVideos
+
+    def saveDisabledVideos(self, disabledVideos):
+        log("CollectSets: Saving %d disabled videos" % len(disabledVideos))
+        # <disabled_screensaver>
+        #     <filename></filename>
+        # </disabled_screensaver>
+        try:
+            root = ET.Element('disabled_screensaver')
+
+            for disabledVideo in disabledVideos:
+                filenameElem = ET.SubElement(root, 'filename')
+                filenameElem.text = disabledVideo
+
+            fileContent = ET.tostring(root, encoding="UTF-8")
+
+            # Save the XML file to disk
+            recordFile = xbmcvfs.File(self.disabledVideosFile, 'w')
+            recordFile.write(fileContent)
+            recordFile.close()
+        except:
+            log("CollectSets: Failed to create XML Content %s" % traceback.format_exc(), xbmc.LOGERROR)
