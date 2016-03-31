@@ -96,7 +96,7 @@ msgctxt "#32019"
 msgid "Preview"
 msgstr ""
 
-#empty strings from id 32019 to 32022
+#empty strings from id 32020 to 32022
 
 msgctxt "#32023"
 msgid "Use All Files In A Folder"

@@ -48,12 +48,19 @@ class MenuNavigator():
         log("VideoScreensaverPlugin: Available Number of Collections is %d" % len(collectionMap))
 
         for collectionKey in sorted(collectionMap.keys()):
-            li = xbmcgui.ListItem(collectionKey, iconImage=__icon__)
+            collectionDetail = collectionMap[collectionKey]
+            li = xbmcgui.ListItem(collectionKey, iconImage=collectionDetail['image'])
             li.setProperty("Fanart_Image", __fanart__)
-            url = self._build_url({'mode': 'collection', 'name': collectionKey, 'link': collectionMap[collectionKey]})
+            url = self._build_url({'mode': 'collection', 'name': collectionKey, 'link': collectionDetail['filename']})
             xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=True)
 
         del collectionCtrl
+
+        # Add a button to support adding a custom collection
+        li = xbmcgui.ListItem("Add Collection...", iconImage=__icon__)
+        li.setProperty("Fanart_Image", __fanart__)
+        url = self._build_url({'mode': 'addcollection'})
+        xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=False)
 
         xbmcplugin.endOfDirectory(self.addon_handle)
 

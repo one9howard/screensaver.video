@@ -30,33 +30,34 @@ class CollectSets():
         collectionsDir = xbmc.translatePath(os_path_join(collectionsDir, 'resources')).decode("utf-8")
 
         collectionsDir = os_path_join(collectionsDir, 'collections')
-        collectionMap['Aquarium'] = os_path_join(collectionsDir, 'aquarium.xml')
-        collectionMap['Beach'] = os_path_join(collectionsDir, 'beach.xml')
-        collectionMap['Clock'] = os_path_join(collectionsDir, 'clock.xml')
-        collectionMap['Fireplace'] = os_path_join(collectionsDir, 'fireplace.xml')
-        collectionMap['Miscellaneous'] = os_path_join(collectionsDir, 'miscellaneous.xml')
-        collectionMap['Snow'] = os_path_join(collectionsDir, 'snow.xml')
-        collectionMap['Space'] = os_path_join(collectionsDir, 'space.xml')
-        collectionMap['Waterfall'] = os_path_join(collectionsDir, 'waterfall.xml')
+        collectionMap['Aquarium'] = {'name': 'Aquarium', 'filename': os_path_join(collectionsDir, 'aquarium.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Beach'] = {'name': 'Beach', 'filename': os_path_join(collectionsDir, 'beach.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Clock'] = {'name': 'Clock', 'filename': os_path_join(collectionsDir, 'clock.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Fireplace'] = {'name': 'Fireplace', 'filename': os_path_join(collectionsDir, 'fireplace.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Miscellaneous'] = {'name': 'Miscellaneous', 'filename': os_path_join(collectionsDir, 'miscellaneous.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Snow'] = {'name': 'Snow', 'filename': os_path_join(collectionsDir, 'snow.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Space'] = {'name': 'Space', 'filename': os_path_join(collectionsDir, 'space.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Waterfall'] = {'name': 'Waterfall', 'filename': os_path_join(collectionsDir, 'waterfall.xml'), 'image': __icon__, 'default': True}
 
         # http://a1.phobos.apple.com/us/r1000/000/Features/atv/AutumnResources/videos/entries.json
-        collectionMap['Apple TV'] = os_path_join(collectionsDir, 'appletv.xml')
+        collectionMap['Apple TV'] = {'name': 'Apple TV', 'filename': os_path_join(collectionsDir, 'appletv.xml'), 'image': __icon__, 'default': True}
 
-        # Check if the collections file exists
-        if xbmcvfs.exists(self.collectSetsFile):
-            # Load the file
-            pass
+        # Now add any custom collections
+        customCollections = self.getCustomCollectionSets()
+        collectionMap.update(customCollections)
 
         return collectionMap
 
-    def loadCollection(self, collectionFile):
+    def loadCollection(self, collectionFile, removeDisabled=True):
         log("CollectSets: Loading collection %s" % collectionFile)
         if not xbmcvfs.exists(collectionFile):
             log("CollectSets: Failed to load collection file: %s" % collectionFile, xbmc.LOGERROR)
             return None
 
         # Load all of the videos that are disabled
-        disabledVideos = self.getDisabledVideos()
+        disabledVideos = []
+        if removeDisabled:
+            disabledVideos = self.getDisabledVideos()
 
         collectionDetails = None
         try:
@@ -71,7 +72,7 @@ class CollectSets():
             if collectionName in [None, ""]:
                 return None
 
-            collectionDetails = {'name': None, 'videos': []}
+            collectionDetails = {'name': None, 'image': None, 'videos': []}
             collectionDetails['name'] = collectionName.text
 
             log("CollectSets: Collection Name is %s" % collectionDetails['name'])
@@ -81,6 +82,10 @@ class CollectSets():
             if encodedElem not in [None, ""]:
                 if encodedElem.text == 'true':
                     isEncoded = True
+
+            imageElem = collectionElem.getroot().find('image')
+            if imageElem not in [None, ""]:
+                collectionDetails['name'] = imageElem.text
 
             # Get the videos that are in the collection
             for elemItem in collectionElem.findall('video'):
@@ -181,3 +186,134 @@ class CollectSets():
             recordFile.close()
         except:
             log("CollectSets: Failed to create XML Content %s" % traceback.format_exc(), xbmc.LOGERROR)
+
+    def getCustomCollectionSets(self):
+        log("CollectSets: Loading collections %s" % self.collectSetsFile)
+
+        customCollections = {}
+        if not xbmcvfs.exists(self.collectSetsFile):
+            log("CollectSets: No custom collections file exists: %s" % self.collectSetsFile)
+            return customCollections
+
+        # <collections>
+        #     <collection>
+        #         <name></name>
+        #         <filename></filename>
+        #         <image></image>
+        #     </collection>
+        # </collections>
+        try:
+            # Load the file as a string
+            collectionFileRef = xbmcvfs.File(self.collectSetsFile, 'r')
+            collectionStr = collectionFileRef.read()
+            collectionFileRef.close()
+
+            collectionSetElem = ET.ElementTree(ET.fromstring(collectionStr))
+
+            # Get the collections that are in the collection set
+            for elemItem in collectionSetElem.findall('collection'):
+                details = {'name': None, 'filename': None, 'image': __icon__, 'default': False}
+
+                collectionName = None
+                nameElem = elemItem.find('name')
+                if nameElem not in [None, ""]:
+                    details['name'] = nameElem.text
+                    collectionName = details['name']
+
+                filenameElem = elemItem.find('filename')
+                if filenameElem not in [None, ""]:
+                    details['filename'] = filenameElem.text
+
+                imageElem = elemItem.find('image')
+                if imageElem not in [None, ""]:
+                    details['image'] = imageElem.text
+
+                if collectionName in [None, ""]:
+                    log("CollectSets: No name specified for collection set")
+                else:
+                    log("CollectSets: Loading custom collection %s (%s)" % (collectionName, filenameElem))
+                    customCollections[collectionName] = details
+        except:
+            log("CollectSets: Failed to read collection file %s" % self.collectSetsFile, xbmc.LOGERROR)
+            log("CollectSets: %s" % traceback.format_exc(), xbmc.LOGERROR)
+
+        return customCollections
+
+    def saveCustomCollections(self, customCollections):
+        log("CollectSets: Saving %d custom collections" % len(customCollections))
+        # <collections>
+        #     <collection>
+        #         <name></name>
+        #         <filename></filename>
+        #         <image></image>
+        #     </collection>
+        # </collections>
+        try:
+            root = ET.Element('collections')
+
+            for customCollectionKey in customCollections.keys():
+                customCollection = customCollections[customCollectionKey]
+                collectionElem = ET.SubElement(root, 'collection')
+
+                nameElem = ET.SubElement(collectionElem, 'name')
+                nameElem.text = customCollection['name']
+
+                filenameElem = ET.SubElement(collectionElem, 'filename')
+                filenameElem.text = customCollection['filename']
+
+                if customCollection['image'] not in [None, ""]:
+                    imageElem = ET.SubElement(collectionElem, 'image')
+                    imageElem.text = customCollection['image']
+
+            fileContent = ET.tostring(root, encoding="UTF-8")
+
+            # Save the XML file to disk
+            recordFile = xbmcvfs.File(self.collectSetsFile, 'w')
+            recordFile.write(fileContent)
+            recordFile.close()
+        except:
+            log("CollectSets: Failed to create XML Content %s" % traceback.format_exc(), xbmc.LOGERROR)
+
+    # Checks auser defined collection to ensure it is correct
+    def checkCustomCollection(self, customXmlFile):
+        log("CollectSets: Checking custom xml file: %s" % customXmlFile)
+
+        # Try and load the collection file to ensure all the data is correct
+        collectionDetails = self.loadCollection(customXmlFile, False)
+
+        if collectionDetails in [None, ""]:
+            log("CollectSets: No collection details returned for %s" % customXmlFile)
+            # TODO: Show error
+            return False
+
+        if collectionDetails['Name'].lower() in ['aquarium', 'beach', 'clock', 'fireplace', 'miscellaneous', 'snow', 'space', 'waterfall', 'apple tv']:
+            log("CollectSets: Collection name clashes %s" % collectionDetails['Name'])
+            # TODO: Show error
+            return False
+
+        # TODO: Add check to see if it clashes with a different custom collection
+
+        # check the number of videos
+        if len(collectionDetails['videos']) < 1:
+            log("CollectSets: Collection contains no videos %s" % customXmlFile)
+            # TODO: Show error
+            return False
+
+        # Check each of the settings for a video, must have name, filename and primary
+        for videoItem in collectionDetails['videos']:
+            if videoItem['name'] in [None, ""]:
+                log("CollectSets: Video without a name in collection %s" % customXmlFile)
+                # TODO: Show error
+                return False
+
+            if videoItem['filename'] in [None, ""]:
+                log("CollectSets: Video without a filename in collection %s" % customXmlFile)
+                # TODO: Show error
+                return False
+
+            if videoItem['primary'] in [None, ""]:
+                log("CollectSets: Video without a primary in collection %s" % customXmlFile)
+                # TODO: Show error
+                return False
+
+        return True
