@@ -201,6 +201,19 @@ class Settings():
         return tempDir
 
     @staticmethod
+    def getCustomFolder():
+        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
+        customDir = os_path_join(addonRootDir, 'custom')
+
+        # Make sure the screensaver folder exists, if not, createe it
+        if not dir_exists(addonRootDir):
+            xbmcvfs.mkdir(addonRootDir)
+        if not dir_exists(customDir):
+            xbmcvfs.mkdir(customDir)
+
+        return customDir
+
+    @staticmethod
     def isFolderNested():
         nested = False
         if Settings.isFolderSelection():

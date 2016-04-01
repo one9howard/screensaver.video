@@ -50,6 +50,7 @@ class MenuNavigator():
         for collectionKey in sorted(collectionMap.keys()):
             collectionDetail = collectionMap[collectionKey]
             li = xbmcgui.ListItem(collectionKey, iconImage=collectionDetail['image'])
+            li.addContextMenuItems([], replaceItems=True)
             li.setProperty("Fanart_Image", __fanart__)
             url = self._build_url({'mode': 'collection', 'name': collectionKey, 'link': collectionDetail['filename']})
             xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=True)
@@ -57,7 +58,8 @@ class MenuNavigator():
         del collectionCtrl
 
         # Add a button to support adding a custom collection
-        li = xbmcgui.ListItem("Add Collection...", iconImage=__icon__)
+        li = xbmcgui.ListItem(__addon__.getLocalizedString(32082), iconImage=__icon__)
+        li.addContextMenuItems([], replaceItems=True)
         li.setProperty("Fanart_Image", __fanart__)
         url = self._build_url({'mode': 'addcollection'})
         xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=False)
@@ -241,6 +243,28 @@ class MenuNavigator():
         # Now reload the screen to reflect the change
         xbmc.executebuiltin("Container.Refresh")
 
+    # Adds a custom collection to the list of sets
+    def addCollection(self):
+        # Prompt the user to select the file
+        customXml = xbmcgui.Dialog().browse(1, __addon__.getLocalizedString(32082), 'files', '.xml')
+
+        if not customXml:
+            return
+
+        # If file selected then check it is OK
+        collectionCtrl = CollectSets()
+        isCollectionValid = collectionCtrl.addCustomCollection(customXml)
+        del collectionCtrl
+
+        if isCollectionValid:
+            log("VideoScreensaverPlugin: collection added: %s" % customXml)
+        else:
+            log("VideoScreensaverPlugin: Failed to add collection: %s" % customXml)
+            xbmcgui.Dialog().notification(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32083), __icon__, 5000, False)
+
+        # Now reload the screen to reflect the change
+        xbmc.executebuiltin("Container.Refresh")
+
     # Construct the context menu
     def _getContextMenu(self, videoItem):
         ctxtMenu = []
@@ -395,4 +419,11 @@ if __name__ == '__main__':
 
         menuNav = MenuNavigator(base_url, addon_handle)
         menuNav.enable(filename, disable)
+        del menuNav
+
+    elif mode[0] == 'addcollection':
+        log("VideoScreensaverPlugin: Mode is addcollection")
+
+        menuNav = MenuNavigator(base_url, addon_handle)
+        menuNav.addCollection()
         del menuNav

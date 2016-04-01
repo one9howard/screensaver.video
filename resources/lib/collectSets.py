@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 import xbmc
 import xbmcaddon
 import xbmcvfs
+import xbmcgui
 
 __addon__ = xbmcaddon.Addon(id='screensaver.video')
 __addonid__ = __addon__.getAddonInfo('id')
@@ -12,7 +13,9 @@ __icon__ = __addon__.getAddonInfo('icon')
 
 # Import the common settings
 from settings import log
+from settings import Settings
 from settings import os_path_join
+from settings import os_path_split
 
 
 class CollectSets():
@@ -20,8 +23,6 @@ class CollectSets():
         addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
         self.collectSetsFile = os_path_join(addonRootDir, 'collectsets.xml')
         self.disabledVideosFile = os_path_join(addonRootDir, 'disabled.xml')
-        self.tempDir = os_path_join(addonRootDir, 'temp')
-        self.videoDir = os_path_join(addonRootDir, 'videos')
 
     def getCollections(self):
         collectionMap = {}
@@ -85,7 +86,7 @@ class CollectSets():
 
             imageElem = collectionElem.getroot().find('image')
             if imageElem not in [None, ""]:
-                collectionDetails['name'] = imageElem.text
+                collectionDetails['image'] = imageElem.text
 
             # Get the videos that are in the collection
             for elemItem in collectionElem.findall('video'):
@@ -241,6 +242,13 @@ class CollectSets():
 
     def saveCustomCollections(self, customCollections):
         log("CollectSets: Saving %d custom collections" % len(customCollections))
+
+        if len(customCollections) < 1:
+            log("CollectSets: Removing custom collections file, as no collections")
+            if xbmcvfs.exists(self.collectSetsFile):
+                xbmcvfs.delete(self.collectSetsFile)
+            return
+
         # <collections>
         #     <collection>
         #         <name></name>
@@ -275,7 +283,7 @@ class CollectSets():
             log("CollectSets: Failed to create XML Content %s" % traceback.format_exc(), xbmc.LOGERROR)
 
     # Checks auser defined collection to ensure it is correct
-    def checkCustomCollection(self, customXmlFile):
+    def addCustomCollection(self, customXmlFile):
         log("CollectSets: Checking custom xml file: %s" % customXmlFile)
 
         # Try and load the collection file to ensure all the data is correct
@@ -286,12 +294,13 @@ class CollectSets():
             # TODO: Show error
             return False
 
-        if collectionDetails['Name'].lower() in ['aquarium', 'beach', 'clock', 'fireplace', 'miscellaneous', 'snow', 'space', 'waterfall', 'apple tv']:
-            log("CollectSets: Collection name clashes %s" % collectionDetails['Name'])
-            # TODO: Show error
-            return False
-
-        # TODO: Add check to see if it clashes with a different custom collection
+        collectionName = collectionDetails['name']
+        if collectionName.lower() in ['aquarium', 'beach', 'clock', 'fireplace', 'miscellaneous', 'snow', 'space', 'waterfall', 'apple tv']:
+            log("CollectSets: Collection name clashes %s" % collectionName)
+            # We return True here, as we have already displayed an error
+            msg = "%s: %s" % (__addon__.getLocalizedString(32084), collectionName)
+            xbmcgui.Dialog().notification(__addon__.getLocalizedString(32005), msg, __icon__, 5000, False)
+            return True
 
         # check the number of videos
         if len(collectionDetails['videos']) < 1:
@@ -315,5 +324,28 @@ class CollectSets():
                 log("CollectSets: Video without a primary in collection %s" % customXmlFile)
                 # TODO: Show error
                 return False
+
+        customCollections = self.getCustomCollectionSets()
+
+        # Add check to see if it clashes with a different custom collection
+        if collectionName in customCollections.keys():
+            log("CollectSets: Custom collection name clashes %s" % collectionName)
+            # We return True here, as we have already displayed an error
+            msg = "%s: %s" % (__addon__.getLocalizedString(32084), collectionName)
+            xbmcgui.Dialog().notification(__addon__.getLocalizedString(32005), msg, __icon__, 5000, False)
+            return True
+
+        # If we have reached here then we are OK to add the custom set, so take a copy of
+        # it to the addon settings directory
+        finalCustomXmlFile = os_path_join(Settings.getCustomFolder(), os_path_split(customXmlFile)[-1])
+        log("CollectSets: Copy from %s to %s" % (customXmlFile, finalCustomXmlFile))
+        copy = xbmcvfs.copy(customXmlFile, finalCustomXmlFile)
+
+        if copy:
+            # Now get the details that are required for the collection
+            customCollections[collectionName] = {'name': collectionName, 'filename': finalCustomXmlFile, 'image': collectionDetails['image'], 'default': False}
+
+            # save the new set of custom collections
+            self.saveCustomCollections(customCollections)
 
         return True

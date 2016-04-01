@@ -260,7 +260,19 @@ msgctxt "#32081"
 msgid "Sunday"
 msgstr ""
 
-#empty strings from id 32082 to 32199
+msgctxt "#32082"
+msgid "Add Collection..."
+msgstr ""
+
+msgctxt "#32083"
+msgid "Failed To Add Collection"
+msgstr ""
+
+msgctxt "#32084"
+msgid "Collection Already Exists"
+msgstr ""
+
+#empty strings from id 32084 to 32199
 
 msgctxt "#32200"
 msgid "Overlay Image"
