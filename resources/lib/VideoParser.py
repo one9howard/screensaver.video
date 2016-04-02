@@ -9,13 +9,11 @@ import xbmc
 import os
 import xbmcaddon
 
-__addon__ = xbmcaddon.Addon(id='screensaver.video')
-__cwd__ = __addon__.getAddonInfo('path').decode("utf-8")
-__resource__ = xbmc.translatePath(os.path.join(__cwd__, 'resources').encode("utf-8")).decode("utf-8")
-__lib__ = xbmc.translatePath(os.path.join(__resource__, 'lib', 'parsers').encode("utf-8")).decode("utf-8")
+ADDON = xbmcaddon.Addon(id='screensaver.video')
+CWD = ADDON.getAddonInfo('path').decode("utf-8")
+LIB_DIR = xbmc.translatePath(os.path.join(CWD, 'resources', 'lib', 'parsers').encode("utf-8")).decode("utf-8")
 
-sys.path.append(__resource__)
-sys.path.append(__lib__)
+sys.path.append(LIB_DIR)
 
 import MP4Parser as MP4Parser
 import AVIParser as AVIParser

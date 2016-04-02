@@ -7,12 +7,11 @@ import xbmcgui
 import traceback
 
 
-__addon__ = xbmcaddon.Addon(id='screensaver.video')
-__cwd__ = __addon__.getAddonInfo('path').decode("utf-8")
-__resource__ = xbmc.translatePath(os.path.join(__cwd__, 'resources').encode("utf-8")).decode("utf-8")
-__lib__ = xbmc.translatePath(os.path.join(__resource__, 'lib').encode("utf-8")).decode("utf-8")
+ADDON = xbmcaddon.Addon(id='screensaver.video')
+CWD = ADDON.getAddonInfo('path').decode("utf-8")
+LIB_DIR = xbmc.translatePath(os.path.join(CWD, 'resources', 'lib').encode("utf-8")).decode("utf-8")
 
-sys.path.append(__lib__)
+sys.path.append(LIB_DIR)
 
 # Import the common settings
 from settings import log
@@ -49,7 +48,7 @@ if __name__ == '__main__':
         # Start the monitor so we can see when the screensaver quits
         exitMon = ScreensaverExitMonitor()
 
-        log("Starting Video Screensaver %s" % __addon__.getAddonInfo('version'))
+        log("Starting Video Screensaver %s" % ADDON.getAddonInfo('version'))
 
         # Make a special check to see if and background media is running (e.g. TvTunes)
         # As we want to give that time to stop before we start trying to play the video
@@ -107,7 +106,7 @@ if __name__ == '__main__':
                     # playing for the screensaver, it will then listen for any action or
                     # activity and stop the video being used as the screensaver
                     log("Running video screensaver in separate thread")
-                    xbmc.executebuiltin('RunScript(%s)' % (os.path.join(__cwd__, "screensaver.py")))
+                    xbmc.executebuiltin('RunScript(%s)' % (os.path.join(CWD, "screensaver.py")))
                     # Give the screensaver time to kick in
                     xbmc.sleep(3000)
                 else:

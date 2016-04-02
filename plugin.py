@@ -10,16 +10,13 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 
-__addon__ = xbmcaddon.Addon(id='screensaver.video')
-__icon__ = __addon__.getAddonInfo('icon')
-__fanart__ = __addon__.getAddonInfo('fanart')
-__cwd__ = __addon__.getAddonInfo('path').decode("utf-8")
-__resource__ = xbmc.translatePath(os.path.join(__cwd__, 'resources').encode("utf-8")).decode("utf-8")
-__lib__ = xbmc.translatePath(os.path.join(__resource__, 'lib').encode("utf-8")).decode("utf-8")
+ADDON = xbmcaddon.Addon(id='screensaver.video')
+ICON = ADDON.getAddonInfo('icon')
+FANART = ADDON.getAddonInfo('fanart')
+CWD = ADDON.getAddonInfo('path').decode("utf-8")
+LIB_DIR = xbmc.translatePath(os.path.join(CWD, 'resources', 'lib').encode("utf-8")).decode("utf-8")
 
-
-sys.path.append(__resource__)
-sys.path.append(__lib__)
+sys.path.append(LIB_DIR)
 
 # Import the common settings
 from settings import Settings
@@ -51,16 +48,16 @@ class MenuNavigator():
             collectionDetail = collectionMap[collectionKey]
             li = xbmcgui.ListItem(collectionKey, iconImage=collectionDetail['image'])
             li.addContextMenuItems([], replaceItems=True)
-            li.setProperty("Fanart_Image", __fanart__)
+            li.setProperty("Fanart_Image", FANART)
             url = self._build_url({'mode': 'collection', 'name': collectionKey, 'link': collectionDetail['filename']})
             xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=True)
 
         del collectionCtrl
 
         # Add a button to support adding a custom collection
-        li = xbmcgui.ListItem(__addon__.getLocalizedString(32082), iconImage=__icon__)
+        li = xbmcgui.ListItem(ADDON.getLocalizedString(32082), iconImage=ICON)
         li.addContextMenuItems([], replaceItems=True)
-        li.setProperty("Fanart_Image", __fanart__)
+        li.setProperty("Fanart_Image", FANART)
         url = self._build_url({'mode': 'addcollection'})
         xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=False)
 
@@ -83,7 +80,7 @@ class MenuNavigator():
         for videoItem in collectionDetails['videos']:
             displayName = videoItem['name']
             if videoItem['enabled'] is False:
-                displayName = "%s %s" % (__addon__.getLocalizedString(32016), displayName)
+                displayName = "%s %s" % (ADDON.getLocalizedString(32016), displayName)
 
             # Create the list-item for this video
             li = xbmcgui.ListItem(displayName, iconImage=videoItem['image'])
@@ -122,7 +119,7 @@ class MenuNavigator():
 
         # Check to see if there is already a file present
         if xbmcvfs.exists(destination):
-            useExisting = xbmcgui.Dialog().yesno(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32301), name, __addon__.getLocalizedString(32302))
+            useExisting = xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32005), ADDON.getLocalizedString(32301), name, ADDON.getLocalizedString(32302))
             if useExisting:
                 # Don't want to overwrite, so nothing to do
                 log("Download: Reusing existing video file %s" % destination)
@@ -133,7 +130,7 @@ class MenuNavigator():
 
         # Create a progress dialog for the  download
         downloadProgressDialog = xbmcgui.DialogProgress()
-        downloadProgressDialog.create(__addon__.getLocalizedString(32303), name, filename, destination)
+        downloadProgressDialog.create(ADDON.getLocalizedString(32303), name, filename, destination)
 
         # Callback method to report progress
         def _report_hook(count, blocksize, totalsize):
@@ -160,7 +157,7 @@ class MenuNavigator():
                 if (fileSize > 0) and (fileSize < 1000000):
                     log("Download: Detected that file %s did not download correctly as file size is only %d" % (downloadURL, fileSize))
                     if showError:
-                        xbmcgui.Dialog().ok(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32306), __addon__.getLocalizedString(32307))
+                        xbmcgui.Dialog().ok(ADDON.getLocalizedString(32005), ADDON.getLocalizedString(32306), ADDON.getLocalizedString(32307))
                 else:
                     log("Download: Copy from %s to %s" % (tmpdestination, destination))
                     copy = xbmcvfs.copy(tmpdestination, destination)
@@ -194,7 +191,7 @@ class MenuNavigator():
 
         # Check to see if there is already a file present
         if xbmcvfs.exists(destination):
-            deleteFile = xbmcgui.Dialog().yesno(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32014), name)
+            deleteFile = xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32005), ADDON.getLocalizedString(32014), name)
             if deleteFile:
                 log("Download: Removing existing file %s" % destination)
                 xbmcvfs.delete(destination)
@@ -246,7 +243,7 @@ class MenuNavigator():
     # Adds a custom collection to the list of sets
     def addCollection(self):
         # Prompt the user to select the file
-        customXml = xbmcgui.Dialog().browse(1, __addon__.getLocalizedString(32082), 'files', '.xml')
+        customXml = xbmcgui.Dialog().browse(1, ADDON.getLocalizedString(32082), 'files', '.xml')
 
         if not customXml:
             return
@@ -260,7 +257,7 @@ class MenuNavigator():
             log("VideoScreensaverPlugin: collection added: %s" % customXml)
         else:
             log("VideoScreensaverPlugin: Failed to add collection: %s" % customXml)
-            xbmcgui.Dialog().notification(__addon__.getLocalizedString(32005), __addon__.getLocalizedString(32083), __icon__, 5000, False)
+            xbmcgui.Dialog().notification(ADDON.getLocalizedString(32005), ADDON.getLocalizedString(32083), ICON, 5000, False)
 
         # Now reload the screen to reflect the change
         xbmc.executebuiltin("Container.Refresh")
@@ -274,25 +271,25 @@ class MenuNavigator():
         if not xbmcvfs.exists(destination):
             # If not already exists, add a download option
             cmd = self._build_url({'mode': 'download', 'name': videoItem['name'], 'filename': videoItem['filename'], 'primary': videoItem['primary'], 'secondary': videoItem['secondary']})
-            ctxtMenu.append((__addon__.getLocalizedString(32013), 'RunPlugin(%s)' % cmd))
+            ctxtMenu.append((ADDON.getLocalizedString(32013), 'RunPlugin(%s)' % cmd))
             # If not already exists, add a download option
             cmd = self._build_url({'mode': 'play', 'name': videoItem['name'], 'filename': videoItem['primary']})
-            ctxtMenu.append((__addon__.getLocalizedString(32019), 'RunPlugin(%s)' % cmd))
+            ctxtMenu.append((ADDON.getLocalizedString(32019), 'RunPlugin(%s)' % cmd))
         else:
             # If already exists then add a play option
             cmd = self._build_url({'mode': 'play', 'name': videoItem['name'], 'filename': videoItem['filename']})
-            ctxtMenu.append((__addon__.getLocalizedString(32015), 'RunPlugin(%s)' % cmd))
+            ctxtMenu.append((ADDON.getLocalizedString(32015), 'RunPlugin(%s)' % cmd))
             # If already exists then add a delete option
             cmd = self._build_url({'mode': 'delete', 'name': videoItem['name'], 'filename': videoItem['filename']})
-            ctxtMenu.append((__addon__.getLocalizedString(32014), 'RunPlugin(%s)' % cmd))
+            ctxtMenu.append((ADDON.getLocalizedString(32014), 'RunPlugin(%s)' % cmd))
 
             # Check if we need a menu item to enable and disable the videos
             if videoItem['enabled']:
                 cmd = self._build_url({'mode': 'enable', 'disable': 'true', 'filename': videoItem['filename']})
-                ctxtMenu.append((__addon__.getLocalizedString(32017), 'RunPlugin(%s)' % cmd))
+                ctxtMenu.append((ADDON.getLocalizedString(32017), 'RunPlugin(%s)' % cmd))
             else:
                 cmd = self._build_url({'mode': 'enable', 'disable': 'false', 'filename': videoItem['filename']})
-                ctxtMenu.append((__addon__.getLocalizedString(32018), 'RunPlugin(%s)' % cmd))
+                ctxtMenu.append((ADDON.getLocalizedString(32018), 'RunPlugin(%s)' % cmd))
 
         return ctxtMenu
 

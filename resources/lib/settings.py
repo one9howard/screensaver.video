@@ -5,16 +5,16 @@ import xbmc
 import xbmcaddon
 import xbmcvfs
 
-__addon__ = xbmcaddon.Addon(id='screensaver.video')
-__addonid__ = __addon__.getAddonInfo('id')
+ADDON = xbmcaddon.Addon(id='screensaver.video')
+ADDON_ID = ADDON.getAddonInfo('id')
 
 
 # Common logging module
 def log(txt, loglevel=xbmc.LOGDEBUG):
-    if (__addon__.getSetting("logEnabled") == "true") or (loglevel != xbmc.LOGDEBUG):
+    if (ADDON.getSetting("logEnabled") == "true") or (loglevel != xbmc.LOGDEBUG):
         if isinstance(txt, str):
             txt = txt.decode("utf-8")
-        message = u'%s: %s' % (__addonid__, txt)
+        message = u'%s: %s' % (ADDON_ID, txt)
         xbmc.log(msg=message.encode("utf-8"), level=loglevel)
 
 
@@ -163,21 +163,21 @@ class Settings():
 
     @staticmethod
     def isFolderSelection():
-        return __addon__.getSetting("useFolder") == "true"
+        return ADDON.getSetting("useFolder") == "true"
 
     @staticmethod
     def getScreensaverVideo():
-        return __addon__.getSetting("screensaverFile").decode("utf-8")
+        return ADDON.getSetting("screensaverFile").decode("utf-8")
 
     @staticmethod
     def getScreensaverFolder():
-        screenFolder = __addon__.getSetting("screensaverFolder").decode("utf-8")
+        screenFolder = ADDON.getSetting("screensaverFolder").decode("utf-8")
 
         # If the screensaver folder has not been set yet, then set it to default
         if screenFolder in [None, ""]:
-            addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
+            addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % ADDON_ID).decode("utf-8")
             screenFolder = os_path_join(addonRootDir, 'videos')
-            __addon__.setSetting("screensaverFolder", screenFolder)
+            ADDON.setSetting("screensaverFolder", screenFolder)
 
             # Make sure the screensaver folder exists, if not, createe it
             if not dir_exists(addonRootDir):
@@ -189,7 +189,7 @@ class Settings():
 
     @staticmethod
     def getTempFolder():
-        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
+        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % ADDON_ID).decode("utf-8")
         tempDir = os_path_join(addonRootDir, 'temp')
 
         # Make sure the screensaver folder exists, if not, createe it
@@ -202,7 +202,7 @@ class Settings():
 
     @staticmethod
     def getCustomFolder():
-        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
+        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % ADDON_ID).decode("utf-8")
         customDir = os_path_join(addonRootDir, 'custom')
 
         # Make sure the screensaver folder exists, if not, createe it
@@ -217,7 +217,7 @@ class Settings():
     def isFolderNested():
         nested = False
         if Settings.isFolderSelection():
-            nested = __addon__.getSetting("screensaverFolderNested") == "true"
+            nested = ADDON.getSetting("screensaverFolderNested") == "true"
         return nested
 
     @staticmethod
@@ -235,31 +235,31 @@ class Settings():
             ruleNum = 1
             while ruleNum < 6:
                 videoFileTag = "rule%dVideoFile" % ruleNum
-                if __addon__.getSetting(videoFileTag) in [None, ""]:
-                    __addon__.setSetting(videoFileTag, defaultFolder)
+                if ADDON.getSetting(videoFileTag) in [None, ""]:
+                    ADDON.setSetting(videoFileTag, defaultFolder)
                 ruleNum = ruleNum + 1
 
     @staticmethod
     def isShowTime():
-        return __addon__.getSetting("showTime") == "true"
+        return ADDON.getSetting("showTime") == "true"
 
     @staticmethod
     def isRandomStart():
-        return __addon__.getSetting("randomStart") == 'true'
+        return ADDON.getSetting("randomStart") == 'true'
 
     @staticmethod
     def isBlockScreensaverIfMediaPlaying():
-        return __addon__.getSetting("mediaPlayingBlock") == 'true'
+        return ADDON.getSetting("mediaPlayingBlock") == 'true'
 
     @staticmethod
     def isLaunchOnStartup():
-        return __addon__.getSetting("launchOnStartup") == 'true'
+        return ADDON.getSetting("launchOnStartup") == 'true'
 
     @staticmethod
     def getVolume():
-        if __addon__.getSetting("alterVolume") == 'false':
+        if ADDON.getSetting("alterVolume") == 'false':
             return -1
-        return int(float(__addon__.getSetting("screensaverVolume")))
+        return int(float(ADDON.getSetting("screensaverVolume")))
 
     @staticmethod
     def getDimValue():
@@ -267,37 +267,37 @@ class Settings():
         # Where 00000000 is not changed
         # So that is a total of 15 different options
         # FF000000 would be completely black, so we do not use that one
-        if __addon__.getSetting("dimLevel"):
-            return Settings.DIM_LEVEL[int(__addon__.getSetting("dimLevel"))]
+        if ADDON.getSetting("dimLevel"):
+            return Settings.DIM_LEVEL[int(ADDON.getSetting("dimLevel"))]
         else:
             return '00000000'
 
     @staticmethod
     def screensaverTimeout():
         timoutSetting = 0
-        if __addon__.getSetting("stopAutomatic") == 'true':
-            timoutSetting = int(float(__addon__.getSetting("stopAfter")))
+        if ADDON.getSetting("stopAutomatic") == 'true':
+            timoutSetting = int(float(ADDON.getSetting("stopAfter")))
         return timoutSetting
 
     @staticmethod
     def isShutdownAfterTimeout():
-        return __addon__.getSetting("stopAutomaticShutdown") == 'true'
+        return ADDON.getSetting("stopAutomaticShutdown") == 'true'
 
     @staticmethod
     def getFolderRepeatType():
         repeatType = Settings.REPEAT_TYPE[0]
-        if __addon__.getSetting("videoSelection") == "1":
-            if Settings.isFolderSelection() and __addon__.getSetting("folderRepeatType"):
-                repeatType = Settings.REPEAT_TYPE[int(__addon__.getSetting("folderRepeatType"))]
+        if ADDON.getSetting("videoSelection") == "1":
+            if Settings.isFolderSelection() and ADDON.getSetting("folderRepeatType"):
+                repeatType = Settings.REPEAT_TYPE[int(ADDON.getSetting("folderRepeatType"))]
         return repeatType
 
     @staticmethod
     def getOverlayImage():
-        if __addon__.getSetting("overlayImage"):
-            overlayId = int(__addon__.getSetting("overlayImage"))
+        if ADDON.getSetting("overlayImage"):
+            overlayId = int(ADDON.getSetting("overlayImage"))
             # Check if this is is the manual defined option, so the last in the selection
             if overlayId >= len(Settings.OVERLAY_IMAGES):
-                return __addon__.getSetting("overlayImageFile").decode("utf-8")
+                return ADDON.getSetting("overlayImageFile").decode("utf-8")
             else:
                 return Settings.OVERLAY_IMAGES[overlayId]
         else:
@@ -306,14 +306,14 @@ class Settings():
     @staticmethod
     def getStartupVolume():
         # Check to see if the volume needs to be changed when the system starts
-        if __addon__.getSetting("resetVolumeOnStartup") == 'true':
-            return int(float(__addon__.getSetting("resetStartupVolumeValue")))
+        if ADDON.getSetting("resetVolumeOnStartup") == 'true':
+            return int(float(ADDON.getSetting("resetStartupVolumeValue")))
         return -1
 
     @staticmethod
     def isUseAudioSuspend():
         if Settings.getVolume() == 0:
-            return __addon__.getSetting("useAudioSuspend") == 'true'
+            return ADDON.getSetting("useAudioSuspend") == 'true'
         return False
 
     @staticmethod
@@ -344,35 +344,35 @@ class Settings():
 
     @staticmethod
     def getScheduleSetting():
-        return int(__addon__.getSetting("scheduleSource"))
+        return int(ADDON.getSetting("scheduleSource"))
 
     @staticmethod
     def getScheduleFile():
         if Settings.getScheduleSetting() == Settings.SCHEDULE_FILE:
-            return __addon__.getSetting("scheduleFile")
+            return ADDON.getSetting("scheduleFile")
         return None
 
     @staticmethod
     def getNumberOfScheduleRules():
         if Settings.getScheduleSetting() == Settings.SCHEDULE_SETTINGS:
-            return int(__addon__.getSetting("numberOfSchuleRules"))
+            return int(ADDON.getSetting("numberOfSchuleRules"))
         return 0
 
     @staticmethod
     def getRuleVideoFile(ruleId):
         videoFileTag = "rule%dVideoFile" % ruleId
-        return __addon__.getSetting(videoFileTag)
+        return ADDON.getSetting(videoFileTag)
 
     @staticmethod
     def getRuleOverlayFile(ruleId):
         overlayImageTag = "rule%dOverlayImage" % ruleId
 
-        if __addon__.getSetting(overlayImageTag):
-            overlayId = int(__addon__.getSetting(overlayImageTag))
+        if ADDON.getSetting(overlayImageTag):
+            overlayId = int(ADDON.getSetting(overlayImageTag))
             # Check if this is is the manual defined option, so the last in the selection
             if overlayId >= len(Settings.OVERLAY_IMAGES):
                 overlayFileTag = "rule%dOverlayFile" % ruleId
-                return __addon__.getSetting(overlayFileTag).decode("utf-8")
+                return ADDON.getSetting(overlayFileTag).decode("utf-8")
             else:
                 return Settings.OVERLAY_IMAGES[overlayId]
         return None
@@ -381,7 +381,7 @@ class Settings():
     def getRuleStartTime(ruleId):
         startTimeTag = "rule%dStartTime" % ruleId
         # Get the start time
-        startTimeStr = __addon__.getSetting(startTimeTag)
+        startTimeStr = ADDON.getSetting(startTimeTag)
         startTimeSplit = startTimeStr.split(':')
         startTime = (int(startTimeSplit[0]) * 60) + int(startTimeSplit[1])
         return startTime
@@ -390,7 +390,7 @@ class Settings():
     def getRuleEndTime(ruleId):
         endTimeTag = "rule%dEndTime" % ruleId
         # Get the end time
-        endTimeStr = __addon__.getSetting(endTimeTag)
+        endTimeStr = ADDON.getSetting(endTimeTag)
         endTimeSplit = endTimeStr.split(':')
         endTime = (int(endTimeSplit[0]) * 60) + int(endTimeSplit[1])
         return endTime
@@ -399,8 +399,8 @@ class Settings():
     def getRuleDay(ruleId):
         dayTag = "rule%dDay" % ruleId
 
-        if __addon__.getSetting(dayTag):
-            dayId = int(__addon__.getSetting(dayTag))
+        if ADDON.getSetting(dayTag):
+            dayId = int(ADDON.getSetting(dayTag))
             if dayId >= len(Settings.DAY_TYPE):
                 return Settings.EVERY_DAY
             else:

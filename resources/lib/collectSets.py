@@ -7,9 +7,8 @@ import xbmcaddon
 import xbmcvfs
 import xbmcgui
 
-__addon__ = xbmcaddon.Addon(id='screensaver.video')
-__addonid__ = __addon__.getAddonInfo('id')
-__icon__ = __addon__.getAddonInfo('icon')
+ADDON = xbmcaddon.Addon(id='screensaver.video')
+ICON = ADDON.getAddonInfo('icon')
 
 # Import the common settings
 from settings import log
@@ -20,28 +19,28 @@ from settings import os_path_split
 
 class CollectSets():
     def __init__(self):
-        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % __addonid__).decode("utf-8")
+        addonRootDir = xbmc.translatePath('special://profile/addon_data/%s' % ADDON.getAddonInfo('id')).decode("utf-8")
         self.collectSetsFile = os_path_join(addonRootDir, 'collectsets.xml')
         self.disabledVideosFile = os_path_join(addonRootDir, 'disabled.xml')
 
     def getCollections(self):
         collectionMap = {}
         # Add the default set of collections
-        collectionsDir = __addon__.getAddonInfo('path').decode("utf-8")
+        collectionsDir = ADDON.getAddonInfo('path').decode("utf-8")
         collectionsDir = xbmc.translatePath(os_path_join(collectionsDir, 'resources')).decode("utf-8")
 
         collectionsDir = os_path_join(collectionsDir, 'collections')
-        collectionMap['Aquarium'] = {'name': 'Aquarium', 'filename': os_path_join(collectionsDir, 'aquarium.xml'), 'image': __icon__, 'default': True}
-        collectionMap['Beach'] = {'name': 'Beach', 'filename': os_path_join(collectionsDir, 'beach.xml'), 'image': __icon__, 'default': True}
-        collectionMap['Clock'] = {'name': 'Clock', 'filename': os_path_join(collectionsDir, 'clock.xml'), 'image': __icon__, 'default': True}
-        collectionMap['Fireplace'] = {'name': 'Fireplace', 'filename': os_path_join(collectionsDir, 'fireplace.xml'), 'image': __icon__, 'default': True}
-        collectionMap['Miscellaneous'] = {'name': 'Miscellaneous', 'filename': os_path_join(collectionsDir, 'miscellaneous.xml'), 'image': __icon__, 'default': True}
-        collectionMap['Snow'] = {'name': 'Snow', 'filename': os_path_join(collectionsDir, 'snow.xml'), 'image': __icon__, 'default': True}
-        collectionMap['Space'] = {'name': 'Space', 'filename': os_path_join(collectionsDir, 'space.xml'), 'image': __icon__, 'default': True}
-        collectionMap['Waterfall'] = {'name': 'Waterfall', 'filename': os_path_join(collectionsDir, 'waterfall.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Aquarium'] = {'name': 'Aquarium', 'filename': os_path_join(collectionsDir, 'aquarium.xml'), 'image': ICON, 'default': True}
+        collectionMap['Beach'] = {'name': 'Beach', 'filename': os_path_join(collectionsDir, 'beach.xml'), 'image': ICON, 'default': True}
+        collectionMap['Clock'] = {'name': 'Clock', 'filename': os_path_join(collectionsDir, 'clock.xml'), 'image': ICON, 'default': True}
+        collectionMap['Fireplace'] = {'name': 'Fireplace', 'filename': os_path_join(collectionsDir, 'fireplace.xml'), 'image': ICON, 'default': True}
+        collectionMap['Miscellaneous'] = {'name': 'Miscellaneous', 'filename': os_path_join(collectionsDir, 'miscellaneous.xml'), 'image': ICON, 'default': True}
+        collectionMap['Snow'] = {'name': 'Snow', 'filename': os_path_join(collectionsDir, 'snow.xml'), 'image': ICON, 'default': True}
+        collectionMap['Space'] = {'name': 'Space', 'filename': os_path_join(collectionsDir, 'space.xml'), 'image': ICON, 'default': True}
+        collectionMap['Waterfall'] = {'name': 'Waterfall', 'filename': os_path_join(collectionsDir, 'waterfall.xml'), 'image': ICON, 'default': True}
 
         # http://a1.phobos.apple.com/us/r1000/000/Features/atv/AutumnResources/videos/entries.json
-        collectionMap['Apple TV'] = {'name': 'Apple TV', 'filename': os_path_join(collectionsDir, 'appletv.xml'), 'image': __icon__, 'default': True}
+        collectionMap['Apple TV'] = {'name': 'Apple TV', 'filename': os_path_join(collectionsDir, 'appletv.xml'), 'image': ICON, 'default': True}
 
         # Now add any custom collections
         customCollections = self.getCustomCollectionSets()
@@ -90,7 +89,7 @@ class CollectSets():
 
             # Get the videos that are in the collection
             for elemItem in collectionElem.findall('video'):
-                video = {'name': None, 'filename': None, 'image': __icon__, 'duration': None, 'primary': None, 'secondary': None, 'enabled': True}
+                video = {'name': None, 'filename': None, 'image': ICON, 'duration': None, 'primary': None, 'secondary': None, 'enabled': True}
 
                 nameElem = elemItem.find('name')
                 if nameElem not in [None, ""]:
@@ -213,7 +212,7 @@ class CollectSets():
 
             # Get the collections that are in the collection set
             for elemItem in collectionSetElem.findall('collection'):
-                details = {'name': None, 'filename': None, 'image': __icon__, 'default': False}
+                details = {'name': None, 'filename': None, 'image': ICON, 'default': False}
 
                 collectionName = None
                 nameElem = elemItem.find('name')
@@ -298,8 +297,8 @@ class CollectSets():
         if collectionName.lower() in ['aquarium', 'beach', 'clock', 'fireplace', 'miscellaneous', 'snow', 'space', 'waterfall', 'apple tv']:
             log("CollectSets: Collection name clashes %s" % collectionName)
             # We return True here, as we have already displayed an error
-            msg = "%s: %s" % (__addon__.getLocalizedString(32084), collectionName)
-            xbmcgui.Dialog().notification(__addon__.getLocalizedString(32005), msg, __icon__, 5000, False)
+            msg = "%s: %s" % (ADDON.getLocalizedString(32084), collectionName)
+            xbmcgui.Dialog().notification(ADDON.getLocalizedString(32005), msg, ICON, 5000, False)
             return True
 
         # check the number of videos
@@ -331,8 +330,8 @@ class CollectSets():
         if collectionName in customCollections.keys():
             log("CollectSets: Custom collection name clashes %s" % collectionName)
             # We return True here, as we have already displayed an error
-            msg = "%s: %s" % (__addon__.getLocalizedString(32084), collectionName)
-            xbmcgui.Dialog().notification(__addon__.getLocalizedString(32005), msg, __icon__, 5000, False)
+            msg = "%s: %s" % (ADDON.getLocalizedString(32084), collectionName)
+            xbmcgui.Dialog().notification(ADDON.getLocalizedString(32005), msg, ICON, 5000, False)
             return True
 
         # If we have reached here then we are OK to add the custom set, so take a copy of
