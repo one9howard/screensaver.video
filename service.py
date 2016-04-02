@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
-import sys
 import os
 import xbmc
 import xbmcaddon
 
+# Import the common settings
+from resources.lib.settings import log
+from resources.lib.settings import Settings
 
 ADDON = xbmcaddon.Addon(id='screensaver.video')
 CWD = ADDON.getAddonInfo('path').decode("utf-8")
-LIB_DIR = xbmc.translatePath(os.path.join(CWD, 'resources', 'lib').encode("utf-8")).decode("utf-8")
-
-sys.path.append(LIB_DIR)
-
-# Import the common settings
-from settings import log
-from settings import Settings
 
 
 ##################################

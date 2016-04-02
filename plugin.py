@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-import os
 import urllib
 import urlparse
 import traceback
@@ -10,19 +9,15 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 
+# Import the common settings
+from resources.lib.settings import Settings
+from resources.lib.settings import log
+from resources.lib.settings import os_path_join
+from resources.lib.collectSets import CollectSets
+
 ADDON = xbmcaddon.Addon(id='screensaver.video')
 ICON = ADDON.getAddonInfo('icon')
 FANART = ADDON.getAddonInfo('fanart')
-CWD = ADDON.getAddonInfo('path').decode("utf-8")
-LIB_DIR = xbmc.translatePath(os.path.join(CWD, 'resources', 'lib').encode("utf-8")).decode("utf-8")
-
-sys.path.append(LIB_DIR)
-
-# Import the common settings
-from settings import Settings
-from settings import log
-from settings import os_path_join
-from collectSets import CollectSets
 
 
 ###################################################################

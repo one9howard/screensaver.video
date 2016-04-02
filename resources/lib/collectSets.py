@@ -7,14 +7,14 @@ import xbmcaddon
 import xbmcvfs
 import xbmcgui
 
-ADDON = xbmcaddon.Addon(id='screensaver.video')
-ICON = ADDON.getAddonInfo('icon')
-
 # Import the common settings
 from settings import log
 from settings import Settings
 from settings import os_path_join
 from settings import os_path_split
+
+ADDON = xbmcaddon.Addon(id='screensaver.video')
+ICON = ADDON.getAddonInfo('icon')
 
 
 class CollectSets():

@@ -15,24 +15,20 @@ if sys.version_info >= (2, 7):
 else:
     import simplejson as json
 
+# Import the common settings
+from resources.lib.settings import log
+from resources.lib.settings import Settings
+from resources.lib.settings import list_dir
+from resources.lib.settings import os_path_join
+from resources.lib.settings import dir_exists
+from resources.lib.settings import os_path_isfile
+from resources.lib.settings import os_path_split
+
+from resources.lib.VideoParser import VideoParser
+from resources.lib.collectSets import CollectSets
 
 ADDON = xbmcaddon.Addon(id='screensaver.video')
 CWD = ADDON.getAddonInfo('path').decode("utf-8")
-LIB_DIR = xbmc.translatePath(os.path.join(CWD, 'resources', 'lib').encode("utf-8")).decode("utf-8")
-
-sys.path.append(LIB_DIR)
-
-# Import the common settings
-from settings import log
-from settings import Settings
-from settings import list_dir
-from settings import os_path_join
-from settings import dir_exists
-from settings import os_path_isfile
-from settings import os_path_split
-
-from VideoParser import VideoParser
-from collectSets import CollectSets
 
 
 # Video Screensaver Player that can detect when the next item in a playlist starts

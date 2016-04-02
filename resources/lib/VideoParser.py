@@ -4,24 +4,15 @@
 # On 21st January 2014
 #   https://github.com/Lunatixz/script.pseudotv.live/tree/master/resources/lib/parsers
 
-import sys
-import xbmc
 import os
-import xbmcaddon
 
-ADDON = xbmcaddon.Addon(id='screensaver.video')
-CWD = ADDON.getAddonInfo('path').decode("utf-8")
-LIB_DIR = xbmc.translatePath(os.path.join(CWD, 'resources', 'lib', 'parsers').encode("utf-8")).decode("utf-8")
+import parsers.MP4Parser as MP4Parser
+import parsers.AVIParser as AVIParser
+import parsers.MKVParser as MKVParser
+import parsers.FLVParser as FLVParser
+import parsers.TSParser as TSParser
 
-sys.path.append(LIB_DIR)
-
-import MP4Parser as MP4Parser
-import AVIParser as AVIParser
-import MKVParser as MKVParser
-import FLVParser as FLVParser
-import TSParser as TSParser
-
-from FileAccess import FileAccess
+from parsers.FileAccess import FileAccess
 
 
 class VideoParser:
