@@ -131,6 +131,9 @@ class MenuNavigator():
         def _report_hook(count, blocksize, totalsize):
             percent = int(float(count * blocksize * 100) / totalsize)
             downloadProgressDialog.update(percent, name, filename, destination)
+            if downloadProgressDialog.iscanceled():
+                log("Download: Operation cancelled")
+                raise ValueError('Download Cancelled')
 
         showError = False
         downloadOK = False
@@ -162,6 +165,11 @@ class MenuNavigator():
                     else:
                         log("Download: Copy Failed")
                 xbmcvfs.delete(tmpdestination)
+            except ValueError:
+                # This was a cancel by the user, so remove any file that may be part downloaded
+                if xbmcvfs.exists(tmpdestination):
+                    xbmcvfs.delete(tmpdestination)
+                    downloadOK = True
             except:
                 log("Download: Theme download Failed!!!", xbmc.LOGERROR)
                 log("Download: %s" % traceback.format_exc(), xbmc.LOGERROR)

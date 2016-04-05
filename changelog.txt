@@ -3,8 +3,7 @@ v1.4.0
 - Allow custom target download folder to be set
 - Allow downloaded videos to be disabled from the screensaver selection
 - Add support for installing custom collections
-TODO: Disable collections videos in one go
-TODO: Support cancel of downloads
+- Support cancel of downloads
 
 v1.3.0 (2016-01-28)
 - Add support for scheduling by day
