@@ -42,7 +42,7 @@ class MenuNavigator():
         for collectionKey in sorted(collectionMap.keys()):
             collectionDetail = collectionMap[collectionKey]
             li = xbmcgui.ListItem(collectionKey, iconImage=collectionDetail['image'])
-            li.addContextMenuItems([], replaceItems=True)
+            li.addContextMenuItems(self._getCollectionsContextMenu(collectionDetail), replaceItems=True)
             li.setProperty("Fanart_Image", FANART)
             url = self._build_url({'mode': 'collection', 'name': collectionKey, 'link': collectionDetail['filename']})
             xbmcplugin.addDirectoryItem(handle=self.addon_handle, url=url, listitem=li, isFolder=True)
@@ -257,6 +257,18 @@ class MenuNavigator():
         # Now reload the screen to reflect the change
         xbmc.executebuiltin("Container.Refresh")
 
+    # Adds a custom collection to the list of sets
+    def removeCollection(self, name):
+        if name in [None, ""]:
+            return
+
+        collectionCtrl = CollectSets()
+        collectionCtrl.removeCustomCollection(name)
+        del collectionCtrl
+
+        # Now reload the screen to reflect the change
+        xbmc.executebuiltin("Container.Refresh")
+
     # Construct the context menu
     def _getContextMenu(self, videoItem):
         ctxtMenu = []
@@ -285,6 +297,18 @@ class MenuNavigator():
             else:
                 cmd = self._build_url({'mode': 'enable', 'disable': 'false', 'filename': videoItem['filename']})
                 ctxtMenu.append((ADDON.getLocalizedString(32018), 'RunPlugin(%s)' % cmd))
+
+        return ctxtMenu
+
+    # Construct the context menu for collections
+    def _getCollectionsContextMenu(self, collectSet):
+        ctxtMenu = []
+
+        # Add the menu item for the custom collections
+        if collectSet['default'] is not True:
+            # If not already exists, add a download option
+            cmd = self._build_url({'mode': 'removecollection', 'name': collectSet['name']})
+            ctxtMenu.append((ADDON.getLocalizedString(32085), 'RunPlugin(%s)' % cmd))
 
         return ctxtMenu
 
@@ -418,4 +442,16 @@ if __name__ == '__main__':
 
         menuNav = MenuNavigator(base_url, addon_handle)
         menuNav.addCollection()
+        del menuNav
+
+    elif mode[0] == 'removecollection':
+        log("VideoScreensaverPlugin: Mode is removecollection")
+
+        name = ''
+        nameItem = args.get('name', None)
+        if (nameItem is not None) and (len(nameItem) > 0):
+            name = nameItem[0]
+
+        menuNav = MenuNavigator(base_url, addon_handle)
+        menuNav.removeCollection(name)
         del menuNav

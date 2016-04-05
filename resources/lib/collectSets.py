@@ -281,7 +281,7 @@ class CollectSets():
         except:
             log("CollectSets: Failed to create XML Content %s" % traceback.format_exc(), xbmc.LOGERROR)
 
-    # Checks auser defined collection to ensure it is correct
+    # Checks a user defined collection to ensure it is correct
     def addCustomCollection(self, customXmlFile):
         log("CollectSets: Checking custom xml file: %s" % customXmlFile)
 
@@ -348,3 +348,16 @@ class CollectSets():
             self.saveCustomCollections(customCollections)
 
         return True
+
+    # remove a custom Collection
+    def removeCustomCollection(self, name):
+        log("CollectSets: Removing Custom Collection: %s" % name)
+
+        customCollections = self.getCustomCollectionSets()
+
+        # Make sure the one we are removing is in the collection set
+        if name in customCollections.keys():
+            log("CollectSets: Custom collection name exists %s" % name)
+            del customCollections[name]
+            # save the new set of custom collections
+            self.saveCustomCollections(customCollections)

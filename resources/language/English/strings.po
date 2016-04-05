@@ -272,7 +272,11 @@ msgctxt "#32084"
 msgid "Collection Already Exists"
 msgstr ""
 
-#empty strings from id 32084 to 32199
+msgctxt "#32085"
+msgid "Remove Collection"
+msgstr ""
+
+#empty strings from id 32086 to 32199
 
 msgctxt "#32200"
 msgid "Overlay Image"
