@@ -258,11 +258,36 @@ class MenuNavigator():
         xbmc.executebuiltin("Container.Refresh")
 
     # Adds a custom collection to the list of sets
-    def removeCollection(self, name):
+    def removeCollection(self, name, link):
         if name in [None, ""]:
             return
 
         collectionCtrl = CollectSets()
+        collectionDetails = collectionCtrl.loadCollection(link)
+
+        filesToDelete = []
+        # If the file was not processed just don't display anything
+        if collectionDetails not in [None, ""]:
+            screensaverFolder = Settings.getScreensaverFolder()
+
+            for videoItem in collectionDetails['videos']:
+                # If theme exists we need to check if we want to delete it
+                if screensaverFolder not in [None, ""]:
+                    videoLocation = os_path_join(screensaverFolder, videoItem['filename'])
+
+                    log("VideoScreensaverPlugin: Checking if %s already downloaded to %s" % (videoItem['filename'], videoLocation))
+                    if xbmcvfs.exists(videoLocation):
+                        filesToDelete.append(videoLocation)
+
+        # If there are possible files to delete, then prompt the user to see if we should
+        if len(filesToDelete) > 0:
+            needDelete = xbmcgui.Dialog().yesno(ADDON.getLocalizedString(32005), ADDON.getLocalizedString(32086))
+
+            if needDelete:
+                for vidFile in filesToDelete:
+                    xbmcvfs.delete(vidFile)
+
+        # Now remove the actual collection
         collectionCtrl.removeCustomCollection(name)
         del collectionCtrl
 
@@ -307,7 +332,7 @@ class MenuNavigator():
         # Add the menu item for the custom collections
         if collectSet['default'] is not True:
             # If not already exists, add a download option
-            cmd = self._build_url({'mode': 'removecollection', 'name': collectSet['name']})
+            cmd = self._build_url({'mode': 'removecollection', 'name': collectSet['name'], 'link': collectSet['filename']})
             ctxtMenu.append((ADDON.getLocalizedString(32085), 'RunPlugin(%s)' % cmd))
 
         return ctxtMenu
@@ -448,10 +473,16 @@ if __name__ == '__main__':
         log("VideoScreensaverPlugin: Mode is removecollection")
 
         name = ''
+        link = None
+
         nameItem = args.get('name', None)
         if (nameItem is not None) and (len(nameItem) > 0):
             name = nameItem[0]
 
+        linkItem = args.get('link', None)
+        if (linkItem is not None) and (len(linkItem) > 0):
+            link = linkItem[0]
+
         menuNav = MenuNavigator(base_url, addon_handle)
-        menuNav.removeCollection(name)
+        menuNav.removeCollection(name, link)
         del menuNav

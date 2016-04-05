@@ -276,7 +276,11 @@ msgctxt "#32085"
 msgid "Remove Collection"
 msgstr ""
 
-#empty strings from id 32086 to 32199
+msgctxt "#32086"
+msgid "Remove Downloaded Video Files?"
+msgstr ""
+
+#empty strings from id 32087 to 32199
 
 msgctxt "#32200"
 msgid "Overlay Image"
